@@ -1,11 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Loader2, ArrowRight, CheckCircle } from "lucide-react"
+import { Loader2, ArrowRight, CheckCircle, Download } from "lucide-react"
 import Image from "next/image"
 
 export default function ProcessPage() {
@@ -13,34 +12,172 @@ export default function ProcessPage() {
   const [progress, setProgress] = useState(0)
   const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null)
   const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null)
-  const router = useRouter()
+  const [watermarkedImageUrl, setWatermarkedImageUrl] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     // Get original image from sessionStorage
     const previewUrl = sessionStorage.getItem("previewUrl")
+    console.log('=== process 页面开始 ===')
+    console.log('从 sessionStorage 获取的 previewUrl:', previewUrl)
+    
     if (previewUrl) {
       setOriginalImageUrl(previewUrl)
+      console.log('开始处理图片:', previewUrl)
+      processImage(previewUrl)
+    } else {
+      console.log('错误: sessionStorage 中没有 previewUrl')
+      setError("No image found. Please upload an image first.")
+      setIsProcessing(false)
     }
-
-    // Simulate processing
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setIsProcessing(false)
-          // Set processed image (with watermark simulation)
-          setProcessedImageUrl("/placeholder.svg?height=400&width=400")
-          return 100
-        }
-        return prev + 5
-      })
-    }, 300)
-
-    return () => clearInterval(interval)
   }, [])
 
-  const handlePayment = () => {
-    router.push("/payment")
+  const processImage = async (imageUrl: string) => {
+    console.log('=== processImage 开始 ===')
+    console.log('处理图片 URL:', imageUrl)
+    
+    try {
+      // Simulate initial progress
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval)
+            return 90
+          }
+          return prev + 2
+        })
+      }, 100)
+
+      console.log('准备调用 /api/process...')
+      // Call the processing API
+      const response = await fetch('/api/process', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ imageUrl }),
+      })
+
+      console.log('process response status:', response.status)
+      console.log('process response ok:', response.ok)
+
+      clearInterval(progressInterval)
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.log('process API 错误:', errorData)
+        throw new Error(errorData.details || 'Processing failed')
+      }
+
+      const data = await response.json()
+      console.log('process response data:', data)
+      console.log('data.success:', data.success)
+      console.log('data.processedImageUrl:', data.processedImageUrl)
+      
+      if (data.success && data.processedImageUrl) {
+        setProcessedImageUrl(data.processedImageUrl)
+        setProgress(100)
+        console.log('处理成功，设置 processedImageUrl:', data.processedImageUrl)
+        
+        // Generate watermarked version
+        setTimeout(() => {
+          generateWatermarkedImage(data.processedImageUrl)
+        }, 500)
+      } else {
+        console.log('错误: 没有收到处理后的图片')
+        throw new Error('No processed image received')
+      }
+    } catch (error) {
+      console.error('Processing error:', error)
+      setError(error instanceof Error ? error.message : 'Processing failed')
+    } finally {
+      setIsProcessing(false)
+      console.log('=== processImage 结束 ===')
+    }
+  }
+
+  const generateWatermarkedImage = (imageUrl: string) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const img = new window.Image()
+    img.crossOrigin = 'anonymous'
+    
+    img.onload = () => {
+      // Set canvas size to match image
+      canvas.width = img.width
+      canvas.height = img.height
+      
+      // Draw the original image
+      ctx.drawImage(img, 0, 0)
+      
+      // Add watermark
+      ctx.save()
+      
+      // Semi-transparent overlay
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Watermark text
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+      ctx.font = `${Math.max(canvas.width * 0.1, 24)}px Arial, sans-serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      
+      // Add some rotation for watermark effect
+      ctx.translate(canvas.width / 2, canvas.height / 2)
+      ctx.rotate(-0.2)
+      ctx.fillText('Preview', 0, 0)
+      
+      ctx.restore()
+      
+      // Convert to data URL
+      const watermarkedDataUrl = canvas.toDataURL('image/jpeg', 0.9)
+      setWatermarkedImageUrl(watermarkedDataUrl)
+    }
+    
+    img.onerror = () => {
+      console.error('Failed to load image for watermarking')
+      setWatermarkedImageUrl(imageUrl) // Fallback to original
+    }
+    
+    img.src = imageUrl
+  }
+
+  const downloadImage = () => {
+    if (!processedImageUrl) return
+    
+    const link = document.createElement('a')
+    link.href = processedImageUrl
+    link.download = `processed-photo-${Date.now()}.jpg`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardHeader>
+            <CardTitle className="text-center text-red-600">エラーが発生しました</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-center text-gray-600 mb-4">{error}</p>
+            <Button 
+              onClick={() => window.history.back()} 
+              className="w-full"
+            >
+              戻る
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -79,13 +216,6 @@ export default function ProcessPage() {
               <div className="flex items-center">
                 <div className="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm">
                   3
-                </div>
-                <span className="ml-2 text-gray-500">支払い</span>
-              </div>
-              <div className="w-8 h-px bg-gray-300"></div>
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm">
-                  4
                 </div>
                 <span className="ml-2 text-gray-500">ダウンロード</span>
               </div>
@@ -138,7 +268,7 @@ export default function ProcessPage() {
                       <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
                         {originalImageUrl && (
                           <Image
-                            src={originalImageUrl || "/placeholder.svg"}
+                            src={originalImageUrl}
                             alt="元の写真"
                             width={250}
                             height={250}
@@ -152,22 +282,14 @@ export default function ProcessPage() {
                     <div className="text-center">
                       <h3 className="font-semibold mb-4">処理後の写真</h3>
                       <div className="border-2 border-emerald-200 rounded-lg p-4 bg-emerald-50 relative">
-                        {processedImageUrl && (
-                          <>
-                            <Image
-                              src={processedImageUrl || "/placeholder.svg"}
-                              alt="処理後の写真"
-                              width={250}
-                              height={250}
-                              className="mx-auto rounded object-cover"
-                            />
-                            {/* Watermark overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="bg-black bg-opacity-50 text-white px-4 py-2 rounded text-sm font-semibold transform rotate-12">
-                                SAMPLE
-                              </div>
-                            </div>
-                          </>
+                        {watermarkedImageUrl && (
+                          <Image
+                            src={watermarkedImageUrl}
+                            alt="処理後の写真"
+                            width={250}
+                            height={250}
+                            className="mx-auto rounded object-cover"
+                          />
                         )}
                       </div>
                       <p className="text-sm text-gray-600 mt-2">※プレビューにはウォーターマークが表示されます</p>
@@ -189,16 +311,18 @@ export default function ProcessPage() {
                   </div>
 
                   <div className="mt-6 text-center">
-                    <div className="bg-white border-2 border-emerald-200 rounded-lg p-4 inline-block mb-4">
-                      <div className="text-2xl font-bold text-emerald-600">¥500</div>
-                      <div className="text-sm text-gray-600">高画質写真1枚</div>
-                    </div>
-                    <div>
-                      <Button onClick={handlePayment} size="lg" className="bg-emerald-600 hover:bg-emerald-700">
-                        支払いに進む
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
+                    <Button 
+                      onClick={downloadImage} 
+                      size="lg" 
+                      className="bg-emerald-600 hover:bg-emerald-700"
+                      disabled={!processedImageUrl}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      高画質写真をダウンロード
+                    </Button>
+                    <p className="text-sm text-gray-600 mt-2">
+                      ダウンロードされる写真にはウォーターマークが含まれません
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -206,6 +330,9 @@ export default function ProcessPage() {
           )}
         </div>
       </div>
+      
+      {/* Hidden canvas for watermark generation */}
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>
   )
 }

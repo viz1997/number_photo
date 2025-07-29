@@ -1,15 +1,19 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Noto_Sans_JP } from "next/font/google"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
+const notoSansJP = Noto_Sans_JP({ 
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "500", "700", "900"],
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   title: "マイナンバーカード写真 | AI自動調整で100%審査通過保証 | ¥500",
   description:
-    "マイナンバーカード写真をAI技術で自動調整。どんな写真も30秒で規格準拠の証件照に変換。100%審査通過保証、不通過なら全額返金。¥500で即座にダウンロード可能。",
-  keywords: "マイナンバーカード,写真,証件照,AI,自動調整,審査通過,オンライン申請,Flux",
+    "マイナンバーカード写真をAI技術で自動調整。どんな写真も30秒で規格準拠のマイナンバー写真に変換。100%審査通過保証、不通過なら全額返金。¥500で即座にダウンロード可能。",
+  keywords: "",
   openGraph: {
     title: "マイナンバーカード写真 | AI自動調整サービス",
     description: "AI技術でマイナンバーカード写真を自動調整。100%審査通過保証で安心。",
@@ -54,7 +58,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={notoSansJP.className}>{children}</body>
     </html>
   )
 }
