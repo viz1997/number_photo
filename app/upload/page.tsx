@@ -127,7 +127,7 @@ export default function UploadPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-center">写真をアップロードしてください</CardTitle>
+              <CardTitle className="text-center">写真を選択してください</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {!uploadedFile ? (

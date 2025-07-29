@@ -169,60 +169,48 @@ export default function HomePage() {
             {/* 标题部分保持居中 */}
             <div className="text-center mb-12">
               <div className="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full inline-block mb-6">
-                最新AI技術でマイナンバーカード写真を自動調整
+              10年間使える完璧な一枚を
               </div>
 
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                大切な10年間を支える
+              10年使う写真だから
                 <br />
-                <span className="text-emerald-600">マイナンバーカード写真</span>
+                <span className="text-emerald-600">最高のマイナンバーカード写真一枚を作りませんか？</span>
               </h2>
 
               <p className="text-xl text-gray-600 mb-8">
-                どんな写真でも最新AI技術で規格に完全対応
+              どんな写真も、AI技術で美しく規格に完全対応
                 <br />
-                <span className="font-bold text-emerald-600">100%審査通過保証・不通過なら全額返金</span>
+                <span className="font-bold text-emerald-600">100%審査通過保証・万が一の場合は全額返金</span>
               </p>
 
               <div className="flex justify-center items-center space-x-8 mb-8">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-emerald-600">30秒</div>
-                  <div className="text-gray-600">完成時間</div>
+                  <div className="text-gray-600">で完成</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-emerald-600">100%</div>
-                  <div className="text-gray-600">審査通過率</div>
+                  <div className="text-3xl font-bold text-emerald-600">確実</div>
+                  <div className="text-gray-600">な品質</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-emerald-600">安心</div>
-                  <div className="text-gray-600">安全保証</div>
+                  <div className="text-gray-600">の保証</div>
                 </div>
               </div>
             </div>
 
             {/* 左右结构的内容区域 */}
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* 左侧：占位图 */}
+              {/* 左侧：处理前图片 */}
               <div className="order-2 lg:order-1">
-                <div className="bg-gray-100 border border-emerald-200 rounded-lg p-8 relative">
-                  <div className="w-full h-80 bg-gray-200 rounded-lg flex items-center justify-center relative">
-                    <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center">
-                      <div className="w-16 h-16 bg-gray-400 rounded-lg flex items-center justify-center">
-                        <div className="w-8 h-8 bg-gray-500 rounded"></div>
-                      </div>
-                    </div>
-                    <div className="absolute top-4 left-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm">
-                      处
-                    </div>
-                    <div className="absolute bottom-4 right-4 bg-gray-600 text-white p-2 rounded-full">
-                      <div className="w-4 h-4 bg-white rounded-full relative">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <Image
+                  src="/my-number-card-photo-before1.webp"
+                  alt="処理前の写真"
+                  width={400}
+                  height={400}
+                  className="rounded-lg object-cover"
+                />
               </div>
 
               {/* 右侧：上传功能 */}
@@ -230,7 +218,7 @@ export default function HomePage() {
                 {currentStep === "upload" && (
                   <Card className="border-2 border-emerald-200">
                     <CardHeader>
-                      <CardTitle className="text-center">写真をアップロードしてください</CardTitle>
+                      <CardTitle className="text-center">写真を選択してください</CardTitle>
                     </CardHeader>
                     <CardContent>
                       {!uploadedFile ? (
@@ -682,194 +670,134 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Security & Guarantee Feature */}
-      <section className="py-16 bg-white">
+
+
+      {/* Features Section */}
+      <section id="features" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* 左侧：内容 */}
-              <div className="order-1 lg:order-1">
-                <div className="space-y-6">
-                  <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
-                    <Shield className="w-4 h-4 mr-2" />
-                    安全・保証
+            {/* 第一行：安全・保証 */}
+            <div className="grid md:grid-cols-2 gap-12 mb-16">
+              {/* 左侧文字内容 */}
+              <div className="space-y-6">
+                <div className="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">
+                  安全・保証
+                </div>
+                <h3 className="text-3xl font-bold text-blue-600">
+                  100%審査通過<br />
+                  <span className="text-blue-700">保証付き</span>
+                </h3>
+                <p className="text-gray-600 text-lg">
+                  審査に通らなかった場合は全額返金。<br />
+                  SSL暗号化で個人情報を完全保護。
+                </p>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <Users className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">100%審査通過保証</h4>
+                      <p className="text-sm text-gray-600">万が一審査に通らなかった場合は、全額返金いたします</p>
+                    </div>
                   </div>
-                  
-                  <h3 className="text-4xl font-bold text-gray-900">
-                    100%審査通過
-                    <br />
-                    <span className="text-blue-600">保証付き</span>
-                  </h3>
-                  
-                  <p className="text-xl text-gray-600 leading-relaxed">
-                    審査に通らなかった場合は全額返金。
-                    <br />
-                    SSL暗号化で個人情報を完全保護。
-                  </p>
-                  
-                  <div className="space-y-4 pt-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Award className="w-6 h-6 text-emerald-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-1">100%審査通過保証</h4>
-                        <p className="text-gray-600">万が一審査に通らなかった場合は、全額返金いたします</p>
-                      </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <Shield className="w-4 h-4 text-blue-600" />
                     </div>
-                    
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Shield className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-1">SSL暗号化通信</h4>
-                        <p className="text-gray-600">個人情報を完全保護、第三者への提供は一切ありません</p>
-                      </div>
+                    <div>
+                      <h4 className="font-semibold">SSL暗号化通信</h4>
+                      <p className="text-sm text-gray-600">個人情報を完全保護、第三者への提供は一切ありません</p>
                     </div>
-                    
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Clock className="w-6 h-6 text-green-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-1">24時間自動削除</h4>
-                        <p className="text-gray-600">処理完了後24時間で写真データを自動削除</p>
-                      </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <Clock className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">24時間自動削除</h4>
+                      <p className="text-sm text-gray-600">処理完了後24時間で写真データを自動削除</p>
                     </div>
                   </div>
                 </div>
               </div>
-
-              {/* 右侧：图片 */}
-              <div className="order-2 lg:order-2">
-                <div className="relative">
-                  <div className="bg-gradient-to-br from-blue-100 to-emerald-100 rounded-2xl p-8 border border-blue-200">
-                    <div className="w-full h-80 bg-white rounded-xl flex items-center justify-center relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-emerald-50"></div>
-                      <div className="relative z-10 text-center">
-                        <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Shield className="w-12 h-12 text-white" />
-                        </div>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-center space-x-2">
-                            <CheckCircle className="w-5 h-5 text-emerald-600" />
-                            <span className="text-sm font-semibold">SSL暗号化</span>
-                          </div>
-                          <div className="flex items-center justify-center space-x-2">
-                            <CheckCircle className="w-5 h-5 text-emerald-600" />
-                            <span className="text-sm font-semibold">100%保証</span>
-                          </div>
-                          <div className="flex items-center justify-center space-x-2">
-                            <CheckCircle className="w-5 h-5 text-emerald-600" />
-                            <span className="text-sm font-semibold">自動削除</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="absolute top-4 left-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        安全
-                      </div>
-                      <div className="absolute bottom-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        保証
-                      </div>
-                    </div>
-                  </div>
-                  <div className="absolute -top-4 -right-4 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
-                  </div>
-                  <div className="absolute -bottom-4 -left-4 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
+              
+              {/* 右侧卡片 */}
+              <div className="relative">
+                <div className="bg-white rounded-2xl p-8 h-80 relative overflow-hidden border border-gray-200">
+                  <div className="absolute inset-0">
+                    <Image
+                      src="/my-number-card-photo-feature1.webp"
+                      alt="安全保証"
+                      fill
+                      className="object-contain rounded-2xl"
+                    />
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* AI Technology Feature */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* 左侧：图片 */}
-              <div className="order-2 lg:order-1">
-                <div className="relative">
-                  <div className="bg-gradient-to-br from-emerald-100 to-blue-100 rounded-2xl p-8 border border-emerald-200">
-                    <div className="w-full h-80 bg-white rounded-xl flex items-center justify-center relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-blue-50"></div>
-                      <div className="relative z-10 text-center">
-                        <div className="w-24 h-24 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Zap className="w-12 h-12 text-white" />
-                        </div>
-                        <div className="space-y-2">
-                          <div className="w-32 h-8 bg-emerald-200 rounded animate-pulse"></div>
-                          <div className="w-24 h-6 bg-blue-200 rounded animate-pulse"></div>
-                          <div className="w-28 h-6 bg-emerald-200 rounded animate-pulse"></div>
-                        </div>
-                      </div>
-                      <div className="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        AI処理中
-                      </div>
-                    </div>
-                  </div>
-                  <div className="absolute -top-4 -left-4 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
-                  </div>
-                  <div className="absolute -bottom-4 -right-4 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
+            {/* 第二行：最新AI技術 */}
+            <div className="grid md:grid-cols-2 gap-12">
+              {/* 左侧卡片 */}
+              <div className="relative">
+                <div className="bg-white rounded-2xl p-8 h-80 relative overflow-hidden border border-gray-200">
+                  <div className="absolute inset-0">
+                    <Image
+                      src="/my-number-card-photo-feature2.webp"
+                      alt="AI処理"
+                      fill
+                      className="object-contain rounded-2xl"
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* 右侧：内容 */}
-              <div className="order-1 lg:order-2">
-                <div className="space-y-6">
-                  <div className="inline-flex items-center px-4 py-2 bg-emerald-100 text-emerald-800 rounded-full text-sm font-semibold">
-                    <Zap className="w-4 h-4 mr-2" />
-                    最新AI技術
+              {/* 右侧文字内容 */}
+              <div className="space-y-6">
+                <div className="inline-block bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                  <Zap className="w-4 h-4" />
+                  <span>最新AI技術</span>
+                </div>
+                <h3 className="text-3xl font-bold">
+                  最新AI技術で<br />
+                  <span className="text-green-600">完璧なマイナンバーカード写真</span>
+                </h3>
+                <p className="text-gray-600 text-lg">
+                  どんな写真でも最新AI技術でマイナンバーカード規格に完全対応。<br />
+                  背景除去、サイズ調整、明度最適化、超自然美顔を自動で実行。
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold text-sm">背景自動除去</h4>
+                        <p className="text-xs text-gray-600">複雑な背景も白背景に自動変換</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold text-sm">超自然美顔</h4>
+                        <p className="text-xs text-gray-600">肌質改善・明度補正で自然な美しさ</p>
+                      </div>
+                    </div>
                   </div>
-                  
-                  <h3 className="text-4xl font-bold text-gray-900">
-                    最新AI技術で
-                    <br />
-                    <span className="text-emerald-600">完璧なマイナンバーカード写真</span>
-                  </h3>
-                  
-                  <p className="text-xl text-gray-600 leading-relaxed">
-                    どんな写真でも最新AI技術でマイナンバーカード規格に完全対応。
-                    <br />
-                    背景除去、サイズ調整、明度最適化、超自然美顔を自動で実行。
-                  </p>
-                  
-                  <div className="grid grid-cols-2 gap-6 pt-6">
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                        <span className="font-semibold">背景自動除去</span>
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold text-sm">サイズ自動調整</h4>
+                        <p className="text-xs text-gray-600">マイナンバーカード規格サイズに完全対応</p>
                       </div>
-                      <p className="text-sm text-gray-600">複雑な背景も白背景に自動変換</p>
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                        <span className="font-semibold">サイズ自動調整</span>
+                    <div className="flex items-start space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold text-sm">画質向上</h4>
+                        <p className="text-xs text-gray-600">マイナンバーカード申請用高画質JPEG形式で出力</p>
                       </div>
-                      <p className="text-sm text-gray-600">マイナンバーカード規格サイズに完全対応</p>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                        <span className="font-semibold">超自然美顔</span>
-                      </div>
-                      <p className="text-sm text-gray-600">肌質改善・明度補正で自然な美しさ</p>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                        <span className="font-semibold">画質向上</span>
-                      </div>
-                      <p className="text-sm text-gray-600">マイナンバーカード申請用高画質JPEG形式で出力</p>
                     </div>
                   </div>
                 </div>
@@ -882,7 +810,7 @@ export default function HomePage() {
       {/* Before/After Comparison */}
       <section id="comparison" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12">処理前後の比較</h3>
+          <h3 className="text-3xl font-bold text-center mb-12">マイナンバーカード写真の処理例</h3>
           <div className="space-y-12 max-w-4xl mx-auto">
             {[
               {
@@ -907,7 +835,7 @@ export default function HomePage() {
                   <h4 className="font-semibold mb-4 text-red-600">処理前</h4>
                   <div className="relative inline-block">
                     <Image
-                      src={`/before${index + 1}.webp`}
+                      src={`/my-number-card-photo-before${index + 1}.webp`}
                       alt={`処理前${index + 1}`}
                       width={300}
                       height={300}
@@ -921,7 +849,7 @@ export default function HomePage() {
                   <h4 className="font-semibold mb-4 text-emerald-600">処理後</h4>
                   <div className="relative inline-block">
                     <Image
-                      src={`/after${index + 1}.webp`}
+                      src={`/my-number-card-photo-after${index + 1}.webp`}
                       alt={`処理後${index + 1}`}
                       width={300}
                       height={300}
@@ -939,42 +867,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12">なぜ選ばれるのか？</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8 text-emerald-600" />
-              </div>
-              <h4 className="font-semibold mb-2">最新AI技術</h4>
-              <p className="text-sm text-gray-600">最新のAI技術でどんな写真も完璧なマイナンバーカード写真に変換</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-8 h-8 text-emerald-600" />
-              </div>
-              <h4 className="font-semibold mb-2">マイナンバーカード規格完全準拠</h4>
-              <p className="text-sm text-gray-600">マイナンバーカード申請規格に完全対応、不通過なら全額返金</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-8 h-8 text-emerald-600" />
-              </div>
-              <h4 className="font-semibold mb-2">超自然美顔</h4>
-              <p className="text-sm text-gray-600">肌質改善・明度補正で自然な美しさを実現</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-emerald-600" />
-              </div>
-              <h4 className="font-semibold mb-2">安全・安心</h4>
-              <p className="text-sm text-gray-600">SSL暗号化通信で個人情報を完全保護</p>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* User Reviews */}
       <section id="reviews" className="py-16 bg-gray-50 overflow-hidden">
@@ -982,7 +875,7 @@ export default function HomePage() {
           <h3 className="text-3xl font-bold text-center mb-12">利用者の声</h3>
           
           {/* 第一行 - 向左移动 */}
-          <div className="mb-8">
+          <div className="mb-0 h-48 overflow-hidden">
             <div className="flex space-x-6 animate-scroll-left hover:pause" style={{ width: 'fit-content' }}>
               {[
                 {
@@ -1205,7 +1098,7 @@ export default function HomePage() {
           </div>
 
           {/* 第二行 - 向右移动 */}
-          <div className="mb-8">
+          <div className="mb-8 h-48 overflow-hidden">
             <div className="flex space-x-6 animate-scroll-right hover:pause" style={{ width: 'fit-content' }}>
               {[
                 {
