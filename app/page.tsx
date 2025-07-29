@@ -144,20 +144,7 @@ export default function HomePage() {
               </div>
               <h1 className="text-xl font-bold text-gray-900">マイナンバーカード写真</h1>
             </div>
-            <nav className="hidden md:flex space-x-6">
-              <a href="#features" className="text-gray-600 hover:text-emerald-600">
-                特徴
-              </a>
-              <a href="#comparison" className="text-gray-600 hover:text-emerald-600">
-                比較
-              </a>
-              <a href="#reviews" className="text-gray-600 hover:text-emerald-600">
-                口コミ
-              </a>
-              <a href="#faq" className="text-gray-600 hover:text-emerald-600">
-                FAQ
-              </a>
-            </nav>
+
           </div>
         </div>
       </header>
@@ -1446,19 +1433,10 @@ export default function HomePage() {
               <ul className="space-y-2 text-sm">
                 <li>
                   <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
-                    マイナンバーカード写真調整
+                    マイナンバーカード写真
                   </a>
                 </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
-                    証件照作成サービス
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
-                    100%審査通過保証
-                  </a>
-                </li>
+    
               </ul>
             </div>
 
@@ -1466,11 +1444,7 @@ export default function HomePage() {
             <div className="space-y-4">
               <h4 className="text-lg font-semibold text-emerald-400">サポート</h4>
               <ul className="space-y-2 text-sm">
-                <li>
-                  <a href="#faq" className="text-gray-400 hover:text-emerald-400 transition-colors">
-                    よくある質問
-                  </a>
-                </li>
+
                 <li>
                   <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
                     利用規約
@@ -1494,18 +1468,9 @@ export default function HomePage() {
           <div className="border-t border-gray-800 mt-6 pt-6">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
               <div className="text-sm text-gray-400">
-                <span>&copy; 2024 マイナンバーカード写真サービス. All rights reserved.</span>
+                <span>&copy; 2025 マイナンバーカード写真サービス. All rights reserved.</span>
               </div>
-              <div className="flex items-center space-x-4 text-sm">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                  <span className="text-gray-400">SSL暗号化通信</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-gray-400">100%保証</span>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
