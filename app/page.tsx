@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
   Upload,
   Camera,
@@ -168,33 +169,33 @@ export default function HomePage() {
             {/* 标题部分保持居中 */}
             <div className="text-center mb-12">
               <div className="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full inline-block mb-6">
-                AI技術でマイナンバーカード写真を自動調整
+                最新AI技術でマイナンバーカード写真を自動調整
               </div>
 
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                マイナンバーカード写真
+                大切な10年間を支える
                 <br />
-                <span className="text-emerald-600">自動調整サービス</span>
+                <span className="text-emerald-600">マイナンバーカード写真</span>
               </h2>
 
               <p className="text-xl text-gray-600 mb-8">
-                どんな写真でもAI技術で規格に完全対応
+                どんな写真でも最新AI技術で規格に完全対応
                 <br />
                 <span className="font-bold text-emerald-600">100%審査通過保証・不通過なら全額返金</span>
               </p>
 
               <div className="flex justify-center items-center space-x-8 mb-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-emerald-600">¥500</div>
-                  <div className="text-gray-600">1枚あたり</div>
+                  <div className="text-3xl font-bold text-emerald-600">30秒</div>
+                  <div className="text-gray-600">完成時間</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-emerald-600">100%</div>
                   <div className="text-gray-600">審査通過率</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-emerald-600">30秒</div>
-                  <div className="text-gray-600">処理時間</div>
+                  <div className="text-3xl font-bold text-emerald-600">安心</div>
+                  <div className="text-gray-600">安全保証</div>
                 </div>
               </div>
             </div>
@@ -288,7 +289,7 @@ export default function HomePage() {
                     <CardContent className="space-y-6">
                       <div className="text-center">
                         <Loader2 className="w-16 h-16 text-emerald-600 animate-spin mx-auto mb-4" />
-                        <p className="text-gray-600 mb-4">Flux AI技術でマイナンバーカード規格に調整中</p>
+                        <p className="text-gray-600 mb-4">最新AI技術でマイナンバーカード規格に調整中</p>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>処理進行状況</span>
@@ -378,7 +379,7 @@ export default function HomePage() {
                             className="mx-auto rounded object-cover border-2 border-emerald-200"
                           />
                         )}
-                        <p className="text-sm text-gray-600 mt-4 mb-4">マイナンバーカード申請規格準拠・高画質JPEG</p>
+                        <p className="text-sm text-gray-600 mt-4 mb-4">マイナンバーカード申請規格準拠・高画質JPEG写真</p>
                         <Button onClick={handleDownload} size="lg" className="bg-emerald-600 hover:bg-emerald-700 mr-4">
                           <Download className="w-5 h-5 mr-2" />
                           高画質写真をダウンロード
@@ -622,11 +623,11 @@ export default function HomePage() {
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">🤖</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">Flux AI技術で自動調整</p>
+                  <p className="text-sm text-gray-600 mb-2">最新AI技術で自動調整</p>
                   <div className="text-xs text-gray-500 space-y-1">
                     <p>• 背景を白に変更</p>
-                    <p>• サイズを規格に調整</p>
-                    <p>• 明度・コントラスト最適化</p>
+                    <p>• サイズをマイナンバーカード規格に調整</p>
+                    <p>• 超自然美顔効果</p>
                   </div>
                 </div>
               </div>
@@ -647,7 +648,7 @@ export default function HomePage() {
                   </div>
                   <p className="text-sm text-gray-600 mb-2">チェックポイント自動確認</p>
                   <div className="text-xs text-gray-500 space-y-1">
-                    <p>• サイズ規格チェック</p>
+                    <p>• マイナンバーカードサイズ規格チェック</p>
                     <p>• 背景色チェック</p>
                     <p>• 画質・明度チェック</p>
                   </div>
@@ -672,7 +673,7 @@ export default function HomePage() {
                   <div className="text-xs text-gray-500 space-y-1">
                     <p>• 高画質JPEG形式</p>
                     <p>• マイナンバーカード規格準拠</p>
-                    <p>• オンライン申請対応</p>
+                    <p>• マイナンバーカードオンライン申請対応</p>
                   </div>
                 </div>
               </div>
@@ -830,15 +831,15 @@ export default function HomePage() {
                   </div>
                   
                   <h3 className="text-4xl font-bold text-gray-900">
-                    Flux AI技術で
+                    最新AI技術で
                     <br />
-                    <span className="text-emerald-600">完璧な証件照</span>
+                    <span className="text-emerald-600">完璧なマイナンバーカード写真</span>
                   </h3>
                   
                   <p className="text-xl text-gray-600 leading-relaxed">
-                    どんな写真でもAI技術で規格に完全対応。
+                    どんな写真でも最新AI技術でマイナンバーカード規格に完全対応。
                     <br />
-                    背景除去、サイズ調整、明度最適化を自動で実行。
+                    背景除去、サイズ調整、明度最適化、超自然美顔を自動で実行。
                   </p>
                   
                   <div className="grid grid-cols-2 gap-6 pt-6">
@@ -854,21 +855,21 @@ export default function HomePage() {
                         <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
                         <span className="font-semibold">サイズ自動調整</span>
                       </div>
-                      <p className="text-sm text-gray-600">規格サイズに完全対応</p>
+                      <p className="text-sm text-gray-600">マイナンバーカード規格サイズに完全対応</p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center">
                         <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                        <span className="font-semibold">明度最適化</span>
+                        <span className="font-semibold">超自然美顔</span>
                       </div>
-                      <p className="text-sm text-gray-600">最適な明度・コントラストに調整</p>
+                      <p className="text-sm text-gray-600">肌質改善・明度補正で自然な美しさ</p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center">
                         <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
                         <span className="font-semibold">画質向上</span>
                       </div>
-                      <p className="text-sm text-gray-600">高画質JPEG形式で出力</p>
+                      <p className="text-sm text-gray-600">マイナンバーカード申請用高画質JPEG形式で出力</p>
                     </div>
                   </div>
                 </div>
@@ -883,37 +884,54 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <h3 className="text-3xl font-bold text-center mb-12">処理前後の比較</h3>
           <div className="space-y-12 max-w-4xl mx-auto">
-            {[1, 2, 3].map((index) => (
+            {[
+              {
+                before: "複雑な背景・服装・表情がマイナンバーカード規格に不適切",
+                after: "完璧な白背景・規格サイズ・自然な表情で審査通過"
+              },
+              {
+                before: "背景がごちゃごちゃ・服装・明度がマイナンバーカード規格に不適切", 
+                after: "完璧な白背景・規格サイズ・最適明度で審査通過"
+              },
+              {
+                before: "寝具背景・服装・サイズがマイナンバーカード規格に不適切",
+                after: "完璧な白背景・規格サイズ・自然な表情で審査通過"
+              },
+              {
+                before: "椅子背景・服装・明度がマイナンバーカード規格に不適切",
+                after: "完璧な白背景・規格サイズ・最適明度で審査通過"
+              }
+            ].map((description, index) => (
               <div key={index} className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="text-center">
                   <h4 className="font-semibold mb-4 text-red-600">処理前</h4>
-                  <div className="relative">
+                  <div className="relative inline-block">
                     <Image
-                      src={`/placeholder.svg?height=300&width=300&text=Before${index}`}
-                      alt={`処理前${index}`}
+                      src={`/before${index + 1}.webp`}
+                      alt={`処理前${index + 1}`}
                       width={300}
                       height={300}
-                      className="mx-auto rounded-lg border-2 border-red-200"
+                      className="rounded-lg border-2 border-red-200 object-cover"
                     />
-                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs">規格外</div>
+                    <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs">NG</div>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">背景・サイズ・明度が不適切</p>
+                  <p className="text-sm text-gray-600 mt-2">{description.before}</p>
                 </div>
                 <div className="text-center">
                   <h4 className="font-semibold mb-4 text-emerald-600">処理後</h4>
-                  <div className="relative">
+                  <div className="relative inline-block">
                     <Image
-                      src={`/placeholder.svg?height=300&width=300&text=After${index}`}
-                      alt={`処理後${index}`}
+                      src={`/after${index + 1}.webp`}
+                      alt={`処理後${index + 1}`}
                       width={300}
                       height={300}
-                      className="mx-auto rounded-lg border-2 border-emerald-200"
+                      className="rounded-lg border-2 border-emerald-200 object-cover"
                     />
-                    <div className="absolute top-2 left-2 bg-emerald-500 text-white px-2 py-1 rounded text-xs">
-                      規格準拠
+                    <div className="absolute top-2 right-2 bg-emerald-500 text-white px-2 py-1 rounded text-xs">
+                      OK
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">完璧な白背景・規格サイズ・最適明度</p>
+                  <p className="text-sm text-gray-600 mt-2">{description.after}</p>
                 </div>
               </div>
             ))}
@@ -930,22 +948,22 @@ export default function HomePage() {
               <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Zap className="w-8 h-8 text-emerald-600" />
               </div>
-              <h4 className="font-semibold mb-2">Flux AI技術</h4>
-              <p className="text-sm text-gray-600">最新のAI技術でどんな写真も完璧な証件照に変換</p>
+              <h4 className="font-semibold mb-2">最新AI技術</h4>
+              <p className="text-sm text-gray-600">最新のAI技術でどんな写真も完璧なマイナンバーカード写真に変換</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-emerald-600" />
               </div>
-              <h4 className="font-semibold mb-2">規格完全準拠</h4>
+              <h4 className="font-semibold mb-2">マイナンバーカード規格完全準拠</h4>
               <p className="text-sm text-gray-600">マイナンバーカード申請規格に完全対応、不通過なら全額返金</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Clock className="w-8 h-8 text-emerald-600" />
               </div>
-              <h4 className="font-semibold mb-2">30秒で完成</h4>
-              <p className="text-sm text-gray-600">アップロードから完成まで最短30秒の高速処理</p>
+              <h4 className="font-semibold mb-2">超自然美顔</h4>
+              <p className="text-sm text-gray-600">肌質改善・明度補正で自然な美しさを実現</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -970,7 +988,7 @@ export default function HomePage() {
                 {
                   name: "田中さん",
                   rating: 5,
-                  comment: "スマホで撮った写真が完璧な証件照になりました！審査も一発通過で大満足です。",
+                  comment: "スマホで撮った写真が完璧なマイナンバーカード写真になりました！審査も一発通過で大満足です。",
                 },
                 {
                   name: "佐藤さん",
@@ -1422,47 +1440,181 @@ export default function HomePage() {
       <section id="faq" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h3 className="text-3xl font-bold text-center mb-12">よくある質問</h3>
-          <div className="max-w-3xl mx-auto space-y-6">
-            {[
-              {
-                q: "どんな写真でも処理できますか？",
-                a: "はい。スマホで撮った写真、古い写真、背景がある写真など、どんな写真でもAI技術で規格に合わせて調整できます。",
-              },
-              {
-                q: "審査に通らなかった場合はどうなりますか？",
-                a: "100%審査通過を保証しています。万が一審査に通らなかった場合は、全額返金いたします。",
-              },
-              {
-                q: "処理にはどのくらい時間がかかりますか？",
-                a: "通常30秒程度で処理が完了します。混雑時でも最大2分以内には完成します。",
-              },
-              {
-                q: "写真のデータは安全ですか？",
-                a: "SSL暗号化通信で保護され、処理完了後24時間で自動削除されます。第三者に提供することは一切ありません。",
-              },
-              {
-                q: "支払い方法は何がありますか？",
-                a: "クレジットカード決済に対応しています。安全な決済システムを使用しているため安心してご利用いただけます。",
-              },
-            ].map((faq, index) => (
-              <Card key={index}>
-                <CardContent className="pt-6">
-                  <h4 className="font-semibold text-emerald-800 mb-2 flex items-center">
-                    <HelpCircle className="w-5 h-5 mr-2" />
+          <div className="max-w-3xl mx-auto">
+            <Accordion type="single" collapsible className="space-y-4">
+              {[
+                {
+                  q: "マイナンバーカードの写真はなんでもいいの?",
+                  a: "いいえ、マイナンバーカードの写真には厳格な規格があります。正面を向いた顔写真で、背景は白または薄い色、表情は自然で、帽子やサングラスは不可です。当サービスでは、どんな写真でもAI技術で規格に合わせて調整いたします。",
+                },
+                {
+                  q: "マイナンバーカードの写真は自分で取ってもいいですか?",
+                  a: "はい、自分で撮影した写真でも問題ありません。ただし、規格に合った写真である必要があります。当サービスをご利用いただければ、自撮り写真でも完璧な証件照に変換できます。",
+                },
+                {
+                  q: "マイナンバーカードの証明写真はスマホで撮影してもいいですか?",
+                  a: "はい、スマホで撮影した写真でも大丈夫です。ただし、画質が良く、顔がはっきりと写っていることが重要です。当サービスでは、スマホ写真でもAI技術で最適化して規格に合わせます。",
+                },
+                {
+                  q: "マイナンバーの写真の化粧はどこまでしていいですか?",
+                  a: "自然な化粧であれば問題ありません。ただし、過度な化粧や特殊メイクは避けてください。普段通りの自然な化粧で撮影することをお勧めします。",
+                },
+                {
+                  q: "マイナンバーカードの写真のNG例は?",
+                  a: "以下のような写真はNGです：帽子やサングラスを着用した写真、背景が複雑な写真、表情が不自然な写真、古い写真、他の人と一緒に写った写真、モノクロ写真など。",
+                },
+                {
+                  q: "マイナンバーカードの写真の眉毛は覆ってもいいですか?",
+                  a: "眉毛を覆う髪の毛がある場合は、顔の特徴がはっきりと分かるように整えてください。ただし、完全に眉毛を隠してしまうのは避けた方が良いでしょう。",
+                },
+                {
+                  q: "マイナンバーカードの写真の服装は?",
+                  a: "特に指定はありませんが、普段着で構いません。ただし、制服やユニフォームは避けることをお勧めします。シンプルで清潔感のある服装が最適です。",
+                },
+                {
+                  q: "マイナンバーカードの写真は何年使えますか?",
+                  a: "マイナンバーカードの有効期限は10年です。ただし、顔の変化が大きい場合は、より新しい写真の使用をお勧めします。",
+                },
+                {
+                  q: "マイナンバーカードの顔写真はどうするの?",
+                  a: "正面を向いた顔写真が必要です。横顔や斜めの写真は不可です。顔がはっきりと写り、表情が自然な写真を撮影してください。",
+                },
+                {
+                  q: "マイナンバーカードの写真は歯を見せる?",
+                  a: "自然な表情で撮影してください。無理に笑顔を作る必要はありませんが、口を閉じた自然な表情が最適です。",
+                },
+                {
+                  q: "マイナンバーカードの前髪はどうする?",
+                  a: "目や眉毛がはっきりと見えるように、前髪は整えてください。顔の特徴を隠さないように注意が必要です。",
+                },
+                {
+                  q: "マイナンバーカードを作らないとどうなる?",
+                  a: "マイナンバーカードの取得は義務ではありませんが、各種手続きで便利な身分証明書として活用できます。取得しない場合でも、マイナンバー通知カードで手続きは可能です。",
+                },
+                {
+                  q: "マイナンバーの写真は笑って撮れない?",
+                  a: "自然な表情で撮影してください。無理に笑顔を作る必要はありませんが、口を閉じた自然な表情が最適です。",
+                },
+                {
+                  q: "マイナンバーカードの自撮りのコツは?",
+                  a: "スマホを顔の高さに合わせ、自然光の下で撮影してください。背景は白い壁やシートを使用し、顔がはっきりと写るようにしましょう。",
+                },
+                {
+                  q: "マイナンバーカードの写真の髪型は女性はどうしたらいいですか?",
+                  a: "顔の特徴がはっきりと分かる髪型にしてください。前髪で目を隠さないよう注意し、自然で清潔感のある髪型が最適です。",
+                },
+                {
+                  q: "マイナンバーカードの更新でメガネをかけても大丈夫?",
+                  a: "はい、普段メガネをかけている方は、メガネをかけた状態で撮影してください。ただし、レンズに反射がないよう注意が必要です。",
+                },
+                {
+                  q: "マイナンバーの写真のルールは?",
+                  a: "正面を向いた顔写真、白または薄い色の背景、自然な表情、帽子やサングラスなし、顔がはっきりと写っていること、6ヶ月以内に撮影した写真であることなどが基本ルールです。",
+                },
+                {
+                  q: "マイナンバーカードの写真はスマホで撮影したものでもいいですか?",
+                  a: "はい、スマホで撮影した写真でも問題ありません。ただし、画質が良く、顔がはっきりと写っていることが重要です。当サービスでは、スマホ写真でもAI技術で最適化して規格に合わせます。",
+                },
+              ].map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index}`} className="border border-gray-200 rounded-lg">
+                  <AccordionTrigger className="px-6 py-4 text-left font-medium text-gray-900 hover:text-emerald-600">
                     {faq.q}
-                  </h4>
-                  <p className="text-gray-600 ml-7">{faq.a}</p>
-                </CardContent>
-              </Card>
-            ))}
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-4 text-gray-600">
+                    {faq.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p>&copy; 2024 マイナンバーカード写真サービス. All rights reserved.</p>
+      <footer className="bg-gray-900 text-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* 公司信息 */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
+                  <Camera className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-xl font-bold">マイナンバーカード写真</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                AI技術でマイナンバーカード写真を自動調整するオンラインサービス。
+              </p>
+            </div>
+
+            {/* サービス */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-emerald-400">サービス</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                    マイナンバーカード写真調整
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                    証件照作成サービス
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                    100%審査通過保証
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* サポート */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-emerald-400">サポート</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a href="#faq" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                    よくある質問
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                    利用規約
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                    プライバシーポリシー
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                    お問い合わせ
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* 分割线 */}
+          <div className="border-t border-gray-800 mt-6 pt-6">
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
+              <div className="text-sm text-gray-400">
+                <span>&copy; 2024 マイナンバーカード写真サービス. All rights reserved.</span>
+              </div>
+              <div className="flex items-center space-x-4 text-sm">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                  <span className="text-gray-400">SSL暗号化通信</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-gray-400">100%保証</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
 
