@@ -137,7 +137,7 @@ export default function UploadPage() {
                     isDragActive ? "border-emerald-500 bg-emerald-50" : "border-gray-300 hover:border-emerald-400"
                   }`}
                 >
-                  <input {...getInputProps()} />
+                  <input {...getInputProps()} accept="image/*" capture="environment" />
                   <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-lg font-semibold text-gray-700 mb-2">
                     {isDragActive ? "ここにファイルをドロップしてください" : "ファイルをドラッグ&ドロップ"}

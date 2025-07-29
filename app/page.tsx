@@ -465,7 +465,7 @@ export default function HomePage() {
             <h3 className="text-3xl font-bold text-center mb-12">マイナンバーカード オンライン申請方法</h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Step 1 */}
-              <div className="text-center">
+              <div className="text-left">
                 <div className="mb-6">
                   <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-200">
                     <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
@@ -473,12 +473,12 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3">メールアドレス登録</h4>
+                <h4 className="font-semibold text-lg mb-3 text-center">メールアドレス登録</h4>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">📧</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">オンライン申請サイトにアクセス</p>
+                  <p className="text-sm text-gray-600 mb-2 text-center">オンライン申請サイトにアクセス</p>
                   <div className="text-xs text-gray-500 space-y-1">
                     <p>• 申請書ID（23桁）</p>
                     <p>• メール連絡用氏名</p>
@@ -486,14 +486,14 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-2">
-                  <p className="text-xs text-gray-800">
+                  <p className="text-xs text-gray-800 text-center">
                     ※第3土曜日0:00～8:00で定期メンテナンス
                   </p>
                 </div>
               </div>
 
               {/* Step 2 */}
-              <div className="text-center">
+              <div className="text-left">
                 <div className="mb-6">
                   <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-200">
                     <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
@@ -501,12 +501,12 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3">顔写真登録</h4>
+                <h4 className="font-semibold text-lg mb-3 text-center">顔写真登録</h4>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">📷</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">申請者専用WEBサイトで写真登録</p>
+                  <p className="text-sm text-gray-600 mb-2 text-center">申請者専用WEBサイトで写真登録</p>
                   <div className="text-xs text-gray-500 space-y-1">
                     <p>• 顔写真登録</p>
                     <p>• 顔写真登録確認</p>
@@ -514,14 +514,14 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-2">
-                  <p className="text-xs text-gray-800">
+                  <p className="text-xs text-gray-800 text-center">
                     ※2024年12月2日より1歳未満は不要
                   </p>
                 </div>
               </div>
 
               {/* Step 3 */}
-              <div className="text-center">
+              <div className="text-left">
                 <div className="mb-6">
                   <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-200">
                     <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
@@ -529,12 +529,12 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3">申請情報登録</h4>
+                <h4 className="font-semibold text-lg mb-3 text-center">申請情報登録</h4>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">📝</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">その他申請に必要な情報を入力</p>
+                  <p className="text-sm text-gray-600 mb-2 text-center">その他申請に必要な情報を入力</p>
                   <div className="text-xs text-gray-500 space-y-1">
                     <p>• 生年月日（必須）</p>
                     <p>• 電子証明書発行希望</p>
@@ -542,14 +542,14 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-2">
-                  <p className="text-xs text-gray-800">
+                  <p className="text-xs text-gray-800 text-center">
                     すべての項目を正確に入力
                   </p>
                 </div>
               </div>
 
               {/* Step 4 */}
-              <div className="text-center">
+              <div className="text-left">
                 <div className="mb-6">
                   <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-200">
                     <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
@@ -557,12 +557,12 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3">申請完了</h4>
+                <h4 className="font-semibold text-lg mb-3 text-center">申請完了</h4>
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">✅</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">必要事項を入力して送信</p>
+                  <p className="text-sm text-gray-600 mb-2 text-center">必要事項を入力して送信</p>
                   <div className="text-xs text-gray-500 space-y-1">
                     <p>• 申請完了メール受信</p>
                     <p>• 申請状況確認可能</p>
@@ -570,7 +570,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-2">
-                  <p className="text-xs text-gray-800">
+                  <p className="text-xs text-gray-800 text-center">
                     メールで申請完了通知
                   </p>
                 </div>
@@ -587,7 +587,7 @@ export default function HomePage() {
             <h3 className="text-3xl font-bold text-center mb-12">マイナンバーカード写真の作り方</h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Step 1: Upload */}
-              <div className="text-center">
+              <div className="text-left">
                 <div className="mb-6">
                   <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-200">
                     <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
@@ -595,12 +595,12 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3">1. 写真をアップロード</h4>
+                <h4 className="font-semibold text-lg mb-3 text-center">1. 写真をアップロード</h4>
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">📱</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">任意の写真をドラッグ&ドロップ</p>
+                  <p className="text-sm text-gray-600 mb-2 text-center">任意の写真をドラッグ&ドロップ</p>
                   <div className="text-xs text-gray-500 space-y-1">
                     <p>• スマホ写真でもOK</p>
                     <p>• 古い写真でもOK</p>
@@ -610,7 +610,7 @@ export default function HomePage() {
               </div>
 
               {/* Step 2: AI Adjustment */}
-              <div className="text-center">
+              <div className="text-left">
                 <div className="mb-6">
                   <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-200">
                     <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
@@ -618,12 +618,12 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3">2. AI自動調整</h4>
+                <h4 className="font-semibold text-lg mb-3 text-center">2. AI自動調整</h4>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">🤖</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">最新AI技術で自動調整</p>
+                  <p className="text-sm text-gray-600 mb-2 text-center">最新AI技術で自動調整</p>
                   <div className="text-xs text-gray-500 space-y-1">
                     <p>• 背景を白に変更</p>
                     <p>• サイズをマイナンバーカード規格に調整</p>
@@ -633,7 +633,7 @@ export default function HomePage() {
               </div>
 
               {/* Step 3: Check */}
-              <div className="text-center">
+              <div className="text-left">
                 <div className="mb-6">
                   <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-200">
                     <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
@@ -641,12 +641,12 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3">3. 規格チェック</h4>
+                <h4 className="font-semibold text-lg mb-3 text-center">3. 規格チェック</h4>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">✅</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">チェックポイント自動確認</p>
+                  <p className="text-sm text-gray-600 mb-2 text-center">チェックポイント自動確認</p>
                   <div className="text-xs text-gray-500 space-y-1">
                     <p>• マイナンバーカードサイズ規格チェック</p>
                     <p>• 背景色チェック</p>
@@ -656,7 +656,7 @@ export default function HomePage() {
               </div>
 
               {/* Step 4: Download */}
-              <div className="text-center">
+              <div className="text-left">
                 <div className="mb-6">
                   <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-200">
                     <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
@@ -664,12 +664,12 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3">4. 高画質版ダウンロード</h4>
+                <h4 className="font-semibold text-lg mb-3 text-center">4. 高画質版ダウンロード</h4>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">💾</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">規格準拠の高画質写真</p>
+                  <p className="text-sm text-gray-600 mb-2 text-center">規格準拠の高画質写真</p>
                   <div className="text-xs text-gray-500 space-y-1">
                     <p>• 高画質JPEG形式</p>
                     <p>• マイナンバーカード規格準拠</p>
@@ -886,23 +886,23 @@ export default function HomePage() {
           <div className="space-y-12 max-w-4xl mx-auto">
             {[
               {
-                before: "複雑な背景・服装・表情がマイナンバーカード規格に不適切",
+                before: "複雑な背景・服装・表情が不適切",
                 after: "完璧な白背景・規格サイズ・自然な表情で審査通過"
               },
               {
-                before: "背景がごちゃごちゃ・服装・明度がマイナンバーカード規格に不適切", 
+                before: "姿勢は正しくない・服装・明度が不適切", 
                 after: "完璧な白背景・規格サイズ・最適明度で審査通過"
               },
               {
-                before: "寝具背景・服装・サイズがマイナンバーカード規格に不適切",
+                before: "寝具背景・服装・写真サイズが不適切",
                 after: "完璧な白背景・規格サイズ・自然な表情で審査通過"
               },
               {
-                before: "椅子背景・服装・明度がマイナンバーカード規格に不適切",
+                before: "椅子背景・服装・明度が不適切",
                 after: "完璧な白背景・規格サイズ・最適明度で審査通過"
               }
             ].map((description, index) => (
-              <div key={index} className="grid md:grid-cols-2 gap-8 items-center">
+              <div key={index} className="grid md:grid-cols-2 gap-8 items-start">
                 <div className="text-center">
                   <h4 className="font-semibold mb-4 text-red-600">処理前</h4>
                   <div className="relative inline-block">
@@ -915,7 +915,7 @@ export default function HomePage() {
                     />
                     <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs">NG</div>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">{description.before}</p>
+                  <p className="text-sm text-gray-700 mt-2 font-medium">{description.before}</p>
                 </div>
                 <div className="text-center">
                   <h4 className="font-semibold mb-4 text-emerald-600">処理後</h4>
@@ -931,7 +931,7 @@ export default function HomePage() {
                       OK
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">{description.after}</p>
+                  <p className="text-sm text-gray-700 mt-2 font-medium">{description.after}</p>
                 </div>
               </div>
             ))}
