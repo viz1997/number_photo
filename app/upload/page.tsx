@@ -16,13 +16,68 @@ export default function UploadPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const router = useRouter()
 
+  const simulateUpload = async (file: File) => {
+    if (!file) return
+    
+    console.log('=== simulateUpload 开始 ===')
+    console.log('上传文件:', file.name, file.size, file.type)
+    
+    setIsUploading(true)
+    setUploadProgress(0)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      
+      console.log('准备发送 /api/upload 请求...')
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      console.log('upload response status:', response.status)
+      console.log('upload response ok:', response.ok)
+
+      if (!response.ok) {
+        throw new Error('Upload failed')
+      }
+
+      const data = await response.json()
+      console.log('upload response data:', data)
+      console.log('data.success:', data.success)
+      console.log('data.imageUrl:', data.imageUrl)
+      
+      if (data.success) {
+        setUploadProgress(100)
+        // Store the uploaded image URL for processing
+        if (data.imageUrl) {
+          console.log('存储 R2 imageUrl 到 sessionStorage:', data.imageUrl)
+          sessionStorage.setItem("previewUrl", data.imageUrl)
+        } else if (previewUrl) {
+          console.log('存储 blob previewUrl 到 sessionStorage:', previewUrl)
+          sessionStorage.setItem("previewUrl", previewUrl)
+        } else {
+          console.log('警告: 没有 imageUrl 也没有 previewUrl')
+        }
+      } else {
+        throw new Error(data.error || 'Upload failed')
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('アップロードに失敗しました。もう一度お試しください。')
+    } finally {
+      setIsUploading(false)
+      console.log('=== simulateUpload 结束 ===')
+    }
+  }
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
     if (file) {
       setUploadedFile(file)
       const url = URL.createObjectURL(file)
       setPreviewUrl(url)
-      simulateUpload()
+      simulateUpload(file)
     }
   }, [])
 
@@ -35,22 +90,6 @@ export default function UploadPage() {
     maxFiles: 1,
     maxSize: 7 * 1024 * 1024, // 7MB
   })
-
-  const simulateUpload = () => {
-    setIsUploading(true)
-    setUploadProgress(0)
-
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setIsUploading(false)
-          return 100
-        }
-        return prev + 10
-      })
-    }, 200)
-  }
 
   const removeFile = () => {
     setUploadedFile(null)
@@ -156,15 +195,6 @@ export default function UploadPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      {previewUrl && (
-                        <Image
-                          src={previewUrl || "/placeholder.svg"}
-                          alt="プレビュー"
-                          width={60}
-                          height={60}
-                          className="rounded object-cover"
-                        />
-                      )}
                       <div>
                         <p className="font-semibold">{uploadedFile.name}</p>
                         <p className="text-sm text-gray-500">{(uploadedFile.size / 1024 / 1024).toFixed(2)} MB</p>
@@ -186,17 +216,54 @@ export default function UploadPage() {
                   )}
 
                   {previewUrl && !isUploading && (
-                    <div className="text-center">
-                      <div className="inline-block border-2 border-gray-200 rounded-lg p-2 mb-4">
-                        <Image
-                          src={previewUrl || "/placeholder.svg"}
-                          alt="アップロードされた写真"
-                          width={200}
-                          height={200}
-                          className="rounded object-cover"
-                        />
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                          <span className="text-green-600 text-lg mr-2">✅</span>
+                          <span className="font-bold text-green-800 text-xl">処理完了！</span>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600">プレビュー</p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* 左侧文案内容 */}
+                        <div className="space-y-4">
+                          <div className="text-green-900 font-semibold text-lg">
+                            次の処理を完了しました
+                          </div>
+                          <ul className="text-green-800 text-sm space-y-2">
+                            <li className="flex items-center">
+                              <span className="text-green-600 mr-2">✅</span>
+                              顔の明るさ・コントラストを自動補正
+                            </li>
+                            <li className="flex items-center">
+                              <span className="text-green-600 mr-2">✅</span>
+                              背景を無地に調整
+                            </li>
+                            <li className="flex items-center">
+                              <span className="text-green-600 mr-2">✅</span>
+                              顔の位置・サイズを規定通りに調整
+                            </li>
+                            <li className="flex items-center">
+                              <span className="text-green-600 mr-2">✅</span>
+                              影や反射を自動除去
+                            </li>
+                          </ul>
+                          <div className="text-green-900 font-semibold text-base">
+                            最終版をゲットして、オンライン申請を進みましょう
+                          </div>
+                        </div>
+                        
+                        {/* 右侧处理后图片 */}
+                        <div className="flex flex-col items-center">
+                          <div className="text-sm text-green-800 font-medium mb-2">処理後の写真</div>
+                          <div className="relative w-48 h-48 bg-white border-2 border-green-300 rounded-lg flex items-center justify-center">
+                            <div className="text-gray-400 text-center">
+                              <div className="text-4xl mb-2">📷</div>
+                              <div className="text-xs">SAMPLE</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
