@@ -1313,9 +1313,12 @@ export default function HomePage() {
           </div>
 
           <div className="text-center mt-8">
-            <div className="inline-flex items-center space-x-4 bg-emerald-50 px-6 py-3 rounded-lg">
-              <Users className="w-6 h-6 text-emerald-600" />
-              <span className="text-emerald-800 font-semibold">累計利用者数: 50,000人突破！</span>
+            <div className="inline-flex flex-col items-center space-y-2 bg-emerald-50 px-6 py-3 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <Users className="w-6 h-6 text-emerald-600" />
+                <span className="text-emerald-800 font-semibold">累計利用者数</span>
+              </div>
+              <span className="text-emerald-800 font-semibold text-lg">20,000人突破！</span>
             </div>
           </div>
         </div>
