@@ -27,6 +27,7 @@ import {
 } from "lucide-react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
+import Link from "next/link"
 
 export default function HomePage() {
   const [currentStep, setCurrentStep] = useState<"upload" | "processing" | "payment" | "download">("upload")
@@ -139,9 +140,13 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
-                <Camera className="w-5 h-5 text-white" />
-              </div>
+              <Image
+                src="/favicon-32x32.png"
+                alt="Logo"
+                width={32}
+                height={32}
+                className="rounded"
+              />
               <h1 className="text-xl font-bold text-gray-900">マイナンバーカード写真</h1>
             </div>
 
@@ -162,7 +167,7 @@ export default function HomePage() {
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
               10年使う写真だから
                 <br />
-                <span className="text-emerald-600">最高のマイナンバーカード写真一枚を作りませんか？</span>
+                <span className="text-emerald-600">最高のマイナンバーカード写真</span><span className="text-gray-900">一枚を作りませんか？</span>
               </h2>
 
               <p className="text-xl text-gray-600 mb-8">
@@ -377,7 +382,7 @@ export default function HomePage() {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h3 className="text-3xl font-bold text-center mb-8">マイナンバーカード 写真のチェックポイント</h3>
+            <h2 className="text-3xl font-bold text-center mb-8">マイナンバーカード 写真のチェックポイント</h2>
             <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200">
               <div className="flex flex-col lg:flex-row items-center gap-8">
                 <div className="flex-shrink-0">
@@ -407,7 +412,7 @@ export default function HomePage() {
                     </li>
                   </ul>
                   <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h4 className="font-semibold text-gray-800 mb-2">オンライン申請の場合</h4>
+                    <h3 className="font-semibold text-gray-800 mb-2">オンライン申請の場合</h3>
                     <ul className="text-sm text-gray-700 space-y-1">
                       <li>• ファイル形式：JPEG</li>
                       <li>• カラーモード：RGBカラー</li>
@@ -437,7 +442,7 @@ export default function HomePage() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h3 className="text-3xl font-bold text-center mb-12">マイナンバーカード オンライン申請方法</h3>
+            <h2 className="text-3xl font-bold text-center mb-12">マイナンバーカード オンライン申請方法</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Step 1 */}
               <div className="text-left">
@@ -448,7 +453,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3 text-center">メールアドレス登録</h4>
+                <h3 className="font-semibold text-lg mb-3 text-center">メールアドレス登録</h3>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">📧</span>
@@ -476,7 +481,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3 text-center">顔写真登録</h4>
+                <h3 className="font-semibold text-lg mb-3 text-center">顔写真登録</h3>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">📷</span>
@@ -504,7 +509,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3 text-center">申請情報登録</h4>
+                <h3 className="font-semibold text-lg mb-3 text-center">申請情報登録</h3>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">📝</span>
@@ -532,7 +537,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3 text-center">申請完了</h4>
+                <h3 className="font-semibold text-lg mb-3 text-center">申請完了</h3>
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">✅</span>
@@ -559,7 +564,7 @@ export default function HomePage() {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h3 className="text-3xl font-bold text-center mb-12">マイナンバーカード写真の作り方</h3>
+            <h2 className="text-3xl font-bold text-center mb-12">マイナンバーカード写真の作り方</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Step 1: Upload */}
               <div className="text-left">
@@ -570,7 +575,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3 text-center">1. 写真をアップロード</h4>
+                <h3 className="font-semibold text-lg mb-3 text-center">1. 写真をアップロード</h3>
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">📱</span>
@@ -593,7 +598,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3 text-center">2. AI自動調整</h4>
+                <h3 className="font-semibold text-lg mb-3 text-center">2. AI自動調整</h3>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">🤖</span>
@@ -616,7 +621,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3 text-center">3. 規格チェック</h4>
+                <h3 className="font-semibold text-lg mb-3 text-center">3. 規格チェック</h3>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">✅</span>
@@ -639,7 +644,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <h4 className="font-semibold text-lg mb-3 text-center">4. 高画質版ダウンロード</h4>
+                <h3 className="font-semibold text-lg mb-3 text-center">4. 高画質版ダウンロード</h3>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-center mb-3">
                     <span className="text-3xl">💾</span>
@@ -670,10 +675,10 @@ export default function HomePage() {
                 <div className="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">
                   安全・保証
                 </div>
-                <h3 className="text-3xl font-bold text-blue-600">
+                <h2 className="text-3xl font-bold text-blue-600">
                   100%審査通過<br />
                   <span className="text-blue-700">保証付き</span>
-                </h3>
+                </h2>
                 <p className="text-gray-600 text-lg">
                   審査に通らなかった場合は全額返金。<br />
                   SSL暗号化で個人情報を完全保護。
@@ -684,7 +689,7 @@ export default function HomePage() {
                       <Users className="w-4 h-4 text-green-600" />
                     </div>
                     <div>
-                      <h4 className="font-semibold">100%審査通過保証</h4>
+                      <h3 className="font-semibold">100%審査通過保証</h3>
                       <p className="text-sm text-gray-600">万が一審査に通らなかった場合は、全額返金いたします</p>
                     </div>
                   </div>
@@ -693,7 +698,7 @@ export default function HomePage() {
                       <Shield className="w-4 h-4 text-blue-600" />
                     </div>
                     <div>
-                      <h4 className="font-semibold">SSL暗号化通信</h4>
+                      <h3 className="font-semibold">SSL暗号化通信</h3>
                       <p className="text-sm text-gray-600">個人情報を完全保護、第三者への提供は一切ありません</p>
                     </div>
                   </div>
@@ -702,7 +707,7 @@ export default function HomePage() {
                       <Clock className="w-4 h-4 text-green-600" />
                     </div>
                     <div>
-                      <h4 className="font-semibold">24時間自動削除</h4>
+                      <h3 className="font-semibold">24時間自動削除</h3>
                       <p className="text-sm text-gray-600">処理完了後24時間で写真データを自動削除</p>
                     </div>
                   </div>
@@ -746,10 +751,10 @@ export default function HomePage() {
                   <Zap className="w-4 h-4" />
                   <span>最新AI技術</span>
                 </div>
-                <h3 className="text-3xl font-bold">
+                <h2 className="text-3xl font-bold">
                   最新AI技術で<br />
                   <span className="text-green-600">完璧なマイナンバーカード写真</span>
-                </h3>
+                </h2>
                 <p className="text-gray-600 text-lg">
                   どんな写真でも最新AI技術でマイナンバーカード規格に完全対応。<br />
                   背景除去、サイズ調整、明度最適化、超自然美顔を自動で実行。
@@ -759,14 +764,14 @@ export default function HomePage() {
                     <div className="flex items-start space-x-2">
                       <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <h4 className="font-semibold text-sm">背景自動除去</h4>
+                        <h3 className="font-semibold text-sm">背景自動除去</h3>
                         <p className="text-xs text-gray-600">複雑な背景も白背景に自動変換</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-2">
                       <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <h4 className="font-semibold text-sm">超自然美顔</h4>
+                        <h3 className="font-semibold text-sm">超自然美顔</h3>
                         <p className="text-xs text-gray-600">肌質改善・明度補正で自然な美しさ</p>
                       </div>
                     </div>
@@ -775,14 +780,14 @@ export default function HomePage() {
                     <div className="flex items-start space-x-2">
                       <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <h4 className="font-semibold text-sm">サイズ自動調整</h4>
+                        <h3 className="font-semibold text-sm">サイズ自動調整</h3>
                         <p className="text-xs text-gray-600">マイナンバーカード規格サイズに完全対応</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-2">
                       <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <h4 className="font-semibold text-sm">画質向上</h4>
+                        <h3 className="font-semibold text-sm">画質向上</h3>
                         <p className="text-xs text-gray-600">マイナンバーカード申請用高画質JPEG形式で出力</p>
                       </div>
                     </div>
@@ -797,7 +802,7 @@ export default function HomePage() {
       {/* Before/After Comparison */}
       <section id="comparison" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12">マイナンバーカード写真の処理例</h3>
+          <h2 className="text-3xl font-bold text-center mb-12">マイナンバーカード写真の処理例</h2>
           <div className="space-y-12 max-w-4xl mx-auto">
             {[
               {
@@ -819,7 +824,7 @@ export default function HomePage() {
             ].map((description, index) => (
               <div key={index} className="grid md:grid-cols-2 gap-8 items-start">
                 <div className="text-center">
-                  <h4 className="font-semibold mb-4 text-red-600">処理前</h4>
+                  <h3 className="font-semibold mb-4 text-red-600">処理前</h3>
                   <div className="relative inline-block">
                     <Image
                       src={`/my-number-card-photo-before${index + 1}.webp`}
@@ -833,7 +838,7 @@ export default function HomePage() {
                   <p className="text-sm text-gray-700 mt-2 font-medium">{description.before}</p>
                 </div>
                 <div className="text-center">
-                  <h4 className="font-semibold mb-4 text-emerald-600">処理後</h4>
+                  <h3 className="font-semibold mb-4 text-emerald-600">処理後</h3>
                   <div className="relative inline-block">
                     <Image
                       src={`/my-number-card-photo-after${index + 1}.webp`}
@@ -859,7 +864,7 @@ export default function HomePage() {
       {/* User Reviews */}
       <section id="reviews" className="py-16 bg-gray-50 overflow-hidden">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12">利用者の声</h3>
+          <h2 className="text-3xl font-bold text-center mb-12">利用者の声</h2>
           
           {/* 第一行 - 向左移动 */}
           <div className="mb-0 h-48 overflow-hidden">
@@ -1319,7 +1324,7 @@ export default function HomePage() {
       {/* FAQ Section */}
       <section id="faq" className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12">よくある質問</h3>
+          <h2 className="text-3xl font-bold text-center mb-12">よくある質問</h2>
           <div className="max-w-3xl mx-auto">
             <Accordion type="single" collapsible className="space-y-4">
               {[
@@ -1417,9 +1422,13 @@ export default function HomePage() {
             {/* 公司信息 */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
-                  <Camera className="w-5 h-5 text-white" />
-                </div>
+                <Image
+                  src="/favicon-32x32.png"
+                  alt="Logo"
+                  width={32}
+                  height={32}
+                  className="rounded"
+                />
                 <h3 className="text-xl font-bold">マイナンバーカード写真</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
@@ -1446,17 +1455,17 @@ export default function HomePage() {
               <ul className="space-y-2 text-sm">
 
                 <li>
-                  <a href="/terms" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                  <Link href="/terms" className="text-gray-400 hover:text-emerald-400 transition-colors">
                     利用規約
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/privacy" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                  <Link href="/privacy" className="text-gray-400 hover:text-emerald-400 transition-colors">
                     プライバシーポリシー
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                  <a href="mailto:support@mynumberphoto.com" className="text-gray-400 hover:text-emerald-400 transition-colors">
                     お問い合わせ
                   </a>
                 </li>
@@ -1468,9 +1477,8 @@ export default function HomePage() {
           <div className="border-t border-gray-800 mt-6 pt-6">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
               <div className="text-sm text-gray-400">
-                <span>&copy; 2025 マイナンバーカード写真サービス. All rights reserved.</span>
+                <span>&copy; 2025 マイナンバーカード写真サービス. All rights reserved.ご不明な点がございましたら:support@mynumberphoto.com</span>
               </div>
-
             </div>
           </div>
         </div>
