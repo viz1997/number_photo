@@ -1446,12 +1446,12 @@ export default function HomePage() {
               <ul className="space-y-2 text-sm">
 
                 <li>
-                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                  <a href="/terms" className="text-gray-400 hover:text-emerald-400 transition-colors">
                     利用規約
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors">
+                  <a href="/privacy" className="text-gray-400 hover:text-emerald-400 transition-colors">
                     プライバシーポリシー
                   </a>
                 </li>
