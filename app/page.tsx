@@ -165,9 +165,9 @@ export default function HomePage() {
               </div>
 
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              10年使う写真だから
+              10年間使える
                 <br />
-                <span className="text-emerald-600">最高のマイナンバーカード写真</span><span className="text-gray-900">一枚を作りませんか？</span>
+                <span className="text-emerald-600">完璧なマイナンバーカード写真</span><span className="text-gray-900">を作りませんか？</span>
               </h2>
 
               <p className="text-xl text-gray-600 mb-8">
@@ -201,18 +201,16 @@ export default function HomePage() {
                   <div className="text-center">
                     <div className="relative">
                       <Image
-                        src="/my-number-card-photo-before1.webp"
+                        src="/my-number-card-photo-sample.webp"
                         alt="処理前の写真"
-                        width={200}
+                        width={380}
                         height={260}
-                        className="lg:w-[280px] lg:h-[360px] rounded-lg object-cover border-2 border-red-200"
+                        className="lg:w-[320px] lg:h-[380px] rounded-lg object-cover border-2 border-red-200"
                         style={{ aspectRatio: '35/45' }}
                       />
-                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-                        NG
-                      </div>
+
                     </div>
-                    <p className="text-xs text-gray-600 mt-2">処理前</p>
+                    <p className="text-xs text-gray-600 mt-2">元の写真</p>
                   </div>
                   
                   {/* 箭头 */}
@@ -222,18 +220,18 @@ export default function HomePage() {
                   <div className="text-center">
                     <div className="relative">
                       <Image
-                        src="/my-number-card-photo-after1.webp"
+                        src="/my-number-card-photo-sample2.webp"
                         alt="処理後の写真"
-                        width={200}
+                        width={380}
                         height={260}
-                        className="lg:w-[280px] lg:h-[360px] rounded-lg object-cover border-2 border-emerald-200"
+                        className="lg:w-[320px] lg:h-[380px] rounded-lg object-cover border-2 border-emerald-200"
                         style={{ aspectRatio: '35/45' }}
                       />
                       <div className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-                        OK
+                        規格適合
                       </div>
                     </div>
-                    <p className="text-xs text-gray-600 mt-2">処理後</p>
+                    <p className="text-xs text-gray-600 mt-2">AI処理後</p>
                   </div>
                 </div>
               </div>
@@ -903,113 +901,12 @@ export default function HomePage() {
           
           {/* 第一行 - 向左移动 */}
           <div className="mb-0 h-48 overflow-hidden">
-            <div className="flex space-x-6 animate-scroll-left hover:pause" style={{ width: 'fit-content' }}>
+            <div className="flex space-x-6 animate-scroll-left hover:pause">
               {[
                 {
                   name: "田中さん",
                   rating: 5,
                   comment: "スマホで撮った写真が完璧なマイナンバーカード写真になりました！審査も一発通過で大満足です。",
-                },
-                {
-                  name: "佐藤さん",
-                  rating: 5,
-                  comment: "写真館に行く時間がなかったので助かりました。30秒で完成するのは本当に便利です。",
-                },
-                {
-                  name: "山田さん",
-                  rating: 5,
-                  comment: "背景がごちゃごちゃした写真でもきれいな白背景に。AI技術の凄さを実感しました。",
-                },
-                {
-                  name: "鈴木さん",
-                  rating: 5,
-                  comment: "自宅で撮った写真がこんなに綺麗になるなんて信じられません。本当に感謝しています！",
-                },
-                {
-                  name: "高橋さん",
-                  rating: 5,
-                  comment: "子供の写真も完璧に処理されて、家族みんなでマイナンバーカード申請できました。",
-                },
-                {
-                  name: "渡辺さん",
-                  rating: 5,
-                  comment: "古い写真でも最新のAI技術で蘇らせてくれました。本当に素晴らしいサービスです。",
-                },
-                {
-                  name: "伊藤さん",
-                  rating: 5,
-                  comment: "仕事が忙しくて写真館に行けなかったので、このサービスは本当に救世主でした。",
-                },
-                {
-                  name: "中村さん",
-                  rating: 5,
-                  comment: "明度調整も完璧で、どんな環境で撮った写真でも規格に合うようにしてくれます。",
-                },
-                {
-                  name: "小林さん",
-                  rating: 5,
-                  comment: "100%審査通過保証があるので安心して利用できました。結果も期待通りでした！",
-                },
-                {
-                  name: "加藤さん",
-                  rating: 5,
-                  comment: "スマホの自撮り写真がこんなに綺麗な証件照になるなんて、技術の進歩を実感しました。",
-                },
-                {
-                  name: "斎藤さん",
-                  rating: 5,
-                  comment: "夜間でも自宅で完璧な証件照が作れるなんて、本当に便利な時代になりました。",
-                },
-                {
-                  name: "松本さん",
-                  rating: 5,
-                  comment: "背景除去の精度が素晴らしいです。複雑な背景でも完璧に白背景に変換されます。",
-                },
-                {
-                  name: "井上さん",
-                  rating: 5,
-                  comment: "30秒で完成するのは本当に驚きです。写真館に行く手間が省けて大助かりです。",
-                },
-                {
-                  name: "野田さん",
-                  rating: 5,
-                  comment: "子供の写真も大人の写真も、どちらも完璧に処理してくれました。家族全員で利用しています。",
-                },
-                {
-                  name: "福田さん",
-                  rating: 5,
-                  comment: "古い写真でも最新の規格に合わせて調整してくれるので、思い出の写真も活用できます。",
-                },
-                {
-                  name: "石川さん",
-                  rating: 5,
-                  comment: "明度調整が完璧で、どんな照明条件でも最適な明度に調整してくれます。",
-                },
-                {
-                  name: "遠藤さん",
-                  rating: 5,
-                  comment: "スマホで撮った写真がこんなに綺麗になるなんて、本当に信じられませんでした。",
-                },
-                {
-                  name: "青木さん",
-                  rating: 5,
-                  comment: "審査に一発で通ったので、このサービスの精度の高さを実感しました。",
-                },
-                {
-                  name: "岡田さん",
-                  rating: 5,
-                  comment: "自宅で完璧な証件照が作れるなんて、本当に画期的なサービスです。",
-                },
-                {
-                  name: "長谷川さん",
-                  rating: 5,
-                  comment: "AI技術の進歩を実感できるサービスです。これからも利用し続けます。",
-                },
-                // 重复前面的评论以确保无缝循环
-                {
-                  name: "田中さん",
-                  rating: 5,
-                  comment: "スマホで撮った写真が完璧な証件照になりました！審査も一発通過で大満足です。",
                 },
                 {
                   name: "佐藤さん",
@@ -1121,114 +1018,130 @@ export default function HomePage() {
                   </CardContent>
                 </Card>
               ))}
+              {/* 重复评论以实现无缝循环 */}
+              {[
+                {
+                  name: "田中さん",
+                  rating: 5,
+                  comment: "スマホで撮った写真が完璧なマイナンバーカード写真になりました！審査も一発通過で大満足です。",
+                },
+                {
+                  name: "佐藤さん",
+                  rating: 5,
+                  comment: "写真館に行く時間がなかったので助かりました。30秒で完成するのは本当に便利です。",
+                },
+                {
+                  name: "山田さん",
+                  rating: 5,
+                  comment: "背景がごちゃごちゃした写真でもきれいな白背景に。AI技術の凄さを実感しました。",
+                },
+                {
+                  name: "鈴木さん",
+                  rating: 5,
+                  comment: "自宅で撮った写真がこんなに綺麗になるなんて信じられません。本当に感謝しています！",
+                },
+                {
+                  name: "高橋さん",
+                  rating: 5,
+                  comment: "子供の写真も完璧に処理されて、家族みんなでマイナンバーカード申請できました。",
+                },
+                {
+                  name: "渡辺さん",
+                  rating: 5,
+                  comment: "古い写真でも最新のAI技術で蘇らせてくれました。本当に素晴らしいサービスです。",
+                },
+                {
+                  name: "伊藤さん",
+                  rating: 5,
+                  comment: "仕事が忙しくて写真館に行けなかったので、このサービスは本当に救世主でした。",
+                },
+                {
+                  name: "中村さん",
+                  rating: 5,
+                  comment: "明度調整も完璧で、どんな環境で撮った写真でも規格に合うようにしてくれます。",
+                },
+                {
+                  name: "小林さん",
+                  rating: 5,
+                  comment: "100%審査通過保証があるので安心して利用できました。結果も期待通りでした！",
+                },
+                {
+                  name: "加藤さん",
+                  rating: 5,
+                  comment: "スマホの自撮り写真がこんなに綺麗な証件照になるなんて、技術の進歩を実感しました。",
+                },
+                {
+                  name: "斎藤さん",
+                  rating: 5,
+                  comment: "夜間でも自宅で完璧な証件照が作れるなんて、本当に便利な時代になりました。",
+                },
+                {
+                  name: "松本さん",
+                  rating: 5,
+                  comment: "背景除去の精度が素晴らしいです。複雑な背景でも完璧に白背景に変換されます。",
+                },
+                {
+                  name: "井上さん",
+                  rating: 5,
+                  comment: "30秒で完成するのは本当に驚きです。写真館に行く手間が省けて大助かりです。",
+                },
+                {
+                  name: "野田さん",
+                  rating: 5,
+                  comment: "子供の写真も大人の写真も、どちらも完璧に処理してくれました。家族全員で利用しています。",
+                },
+                {
+                  name: "福田さん",
+                  rating: 5,
+                  comment: "古い写真でも最新の規格に合わせて調整してくれるので、思い出の写真も活用できます。",
+                },
+                {
+                  name: "石川さん",
+                  rating: 5,
+                  comment: "明度調整が完璧で、どんな照明条件でも最適な明度に調整してくれます。",
+                },
+                {
+                  name: "遠藤さん",
+                  rating: 5,
+                  comment: "スマホで撮った写真がこんなに綺麗になるなんて、本当に信じられませんでした。",
+                },
+                {
+                  name: "青木さん",
+                  rating: 5,
+                  comment: "審査に一発で通ったので、このサービスの精度の高さを実感しました。",
+                },
+                {
+                  name: "岡田さん",
+                  rating: 5,
+                  comment: "自宅で完璧な証件照が作れるなんて、本当に画期的なサービスです。",
+                },
+                {
+                  name: "長谷川さん",
+                  rating: 5,
+                  comment: "AI技術の進歩を実感できるサービスです。これからも利用し続けます。",
+                },
+              ].map((review, index) => (
+                <Card key={`duplicate-${index}`} className="border-emerald-200 min-w-[300px] flex-shrink-0">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center mb-4">
+                      <div className="flex space-x-1">
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
+                      <span className="ml-2 font-semibold">{review.name}</span>
+                    </div>
+                    <p className="text-gray-600 text-sm">{review.comment}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
 
           {/* 第二行 - 向右移动 */}
           <div className="mb-8 h-48 overflow-hidden">
-            <div className="flex space-x-6 animate-scroll-right hover:pause" style={{ width: 'fit-content' }}>
+            <div className="flex space-x-6 animate-scroll-right hover:pause">
               {[
-                {
-                  name: "西村さん",
-                  rating: 5,
-                  comment: "写真館に行く時間とお金を節約できて、しかも完璧な品質。本当に感謝しています。",
-                },
-                {
-                  name: "前田さん",
-                  rating: 5,
-                  comment: "子供の写真も大人の写真も、どちらも完璧に処理してくれました。家族全員で利用しています。",
-                },
-                {
-                  name: "中島さん",
-                  rating: 5,
-                  comment: "古い写真でも最新の規格に合わせて調整してくれるので、思い出の写真も活用できます。",
-                },
-                {
-                  name: "藤田さん",
-                  rating: 5,
-                  comment: "明度調整が完璧で、どんな照明条件でも最適な明度に調整してくれます。",
-                },
-                {
-                  name: "後藤さん",
-                  rating: 5,
-                  comment: "スマホで撮った写真がこんなに綺麗になるなんて、本当に信じられませんでした。",
-                },
-                {
-                  name: "近藤さん",
-                  rating: 5,
-                  comment: "審査に一発で通ったので、このサービスの精度の高さを実感しました。",
-                },
-                {
-                  name: "村上さん",
-                  rating: 5,
-                  comment: "自宅で完璧な証件照が作れるなんて、本当に画期的なサービスです。",
-                },
-                {
-                  name: "太田さん",
-                  rating: 5,
-                  comment: "AI技術の進歩を実感できるサービスです。これからも利用し続けます。",
-                },
-                {
-                  name: "石井さん",
-                  rating: 5,
-                  comment: "背景除去の精度が素晴らしいです。複雑な背景でも完璧に白背景に変換されます。",
-                },
-                {
-                  name: "小川さん",
-                  rating: 5,
-                  comment: "30秒で完成するのは本当に驚きです。写真館に行く手間が省けて大助かりです。",
-                },
-                {
-                  name: "坂本さん",
-                  rating: 5,
-                  comment: "夜間でも自宅で完璧な証件照が作れるなんて、本当に便利な時代になりました。",
-                },
-                {
-                  name: "森さん",
-                  rating: 5,
-                  comment: "100%審査通過保証があるので安心して利用できました。結果も期待通りでした！",
-                },
-                {
-                  name: "山口さん",
-                  rating: 5,
-                  comment: "スマホの自撮り写真がこんなに綺麗な証件照になるなんて、技術の進歩を実感しました。",
-                },
-                {
-                  name: "阿部さん",
-                  rating: 5,
-                  comment: "写真館に行く時間がなかったので助かりました。30秒で完成するのは本当に便利です。",
-                },
-                {
-                  name: "吉田さん",
-                  rating: 5,
-                  comment: "自宅で撮った写真がこんなに綺麗になるなんて信じられません。本当に感謝しています！",
-                },
-                {
-                  name: "佐々木さん",
-                  rating: 5,
-                  comment: "子供の写真も完璧に処理されて、家族みんなでマイナンバーカード申請できました。",
-                },
-                {
-                  name: "松井さん",
-                  rating: 5,
-                  comment: "古い写真でも最新のAI技術で蘇らせてくれました。本当に素晴らしいサービスです。",
-                },
-                {
-                  name: "橋本さん",
-                  rating: 5,
-                  comment: "仕事が忙しくて写真館に行けなかったので、このサービスは本当に救世主でした。",
-                },
-                {
-                  name: "清水さん",
-                  rating: 5,
-                  comment: "明度調整も完璧で、どんな環境で撮った写真でも規格に合うようにしてくれます。",
-                },
-                {
-                  name: "高木さん",
-                  rating: 5,
-                  comment: "スマホで撮った写真が完璧な証件照になりました！審査も一発通過で大満足です。",
-                },
-                // 重复前面的评论以确保无缝循环
                 {
                   name: "西村さん",
                   rating: 5,
@@ -1331,6 +1244,123 @@ export default function HomePage() {
                 },
               ].map((review, index) => (
                 <Card key={index} className="border-emerald-200 min-w-[300px] flex-shrink-0">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center mb-4">
+                      <div className="flex space-x-1">
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
+                      <span className="ml-2 font-semibold">{review.name}</span>
+                    </div>
+                    <p className="text-gray-600 text-sm">{review.comment}</p>
+                  </CardContent>
+                </Card>
+              ))}
+              {/* 重复评论以实现无缝循环 */}
+              {[
+                {
+                  name: "西村さん",
+                  rating: 5,
+                  comment: "写真館に行く時間とお金を節約できて、しかも完璧な品質。本当に感謝しています。",
+                },
+                {
+                  name: "前田さん",
+                  rating: 5,
+                  comment: "子供の写真も大人の写真も、どちらも完璧に処理してくれました。家族全員で利用しています。",
+                },
+                {
+                  name: "中島さん",
+                  rating: 5,
+                  comment: "古い写真でも最新の規格に合わせて調整してくれるので、思い出の写真も活用できます。",
+                },
+                {
+                  name: "藤田さん",
+                  rating: 5,
+                  comment: "明度調整が完璧で、どんな照明条件でも最適な明度に調整してくれます。",
+                },
+                {
+                  name: "後藤さん",
+                  rating: 5,
+                  comment: "スマホで撮った写真がこんなに綺麗になるなんて、本当に信じられませんでした。",
+                },
+                {
+                  name: "近藤さん",
+                  rating: 5,
+                  comment: "審査に一発で通ったので、このサービスの精度の高さを実感しました。",
+                },
+                {
+                  name: "村上さん",
+                  rating: 5,
+                  comment: "自宅で完璧な証件照が作れるなんて、本当に画期的なサービスです。",
+                },
+                {
+                  name: "太田さん",
+                  rating: 5,
+                  comment: "AI技術の進歩を実感できるサービスです。これからも利用し続けます。",
+                },
+                {
+                  name: "石井さん",
+                  rating: 5,
+                  comment: "背景除去の精度が素晴らしいです。複雑な背景でも完璧に白背景に変換されます。",
+                },
+                {
+                  name: "小川さん",
+                  rating: 5,
+                  comment: "30秒で完成するのは本当に驚きです。写真館に行く手間が省けて大助かりです。",
+                },
+                {
+                  name: "坂本さん",
+                  rating: 5,
+                  comment: "夜間でも自宅で完璧な証件照が作れるなんて、本当に便利な時代になりました。",
+                },
+                {
+                  name: "森さん",
+                  rating: 5,
+                  comment: "100%審査通過保証があるので安心して利用できました。結果も期待通りでした！",
+                },
+                {
+                  name: "山口さん",
+                  rating: 5,
+                  comment: "スマホの自撮り写真がこんなに綺麗な証件照になるなんて、技術の進歩を実感しました。",
+                },
+                {
+                  name: "阿部さん",
+                  rating: 5,
+                  comment: "写真館に行く時間がなかったので助かりました。30秒で完成するのは本当に便利です。",
+                },
+                {
+                  name: "吉田さん",
+                  rating: 5,
+                  comment: "自宅で撮った写真がこんなに綺麗になるなんて信じられません。本当に感謝しています！",
+                },
+                {
+                  name: "佐々木さん",
+                  rating: 5,
+                  comment: "子供の写真も完璧に処理されて、家族みんなでマイナンバーカード申請できました。",
+                },
+                {
+                  name: "松井さん",
+                  rating: 5,
+                  comment: "古い写真でも最新のAI技術で蘇らせてくれました。本当に素晴らしいサービスです。",
+                },
+                {
+                  name: "橋本さん",
+                  rating: 5,
+                  comment: "仕事が忙しくて写真館に行けなかったので、このサービスは本当に救世主でした。",
+                },
+                {
+                  name: "清水さん",
+                  rating: 5,
+                  comment: "明度調整も完璧で、どんな環境で撮った写真でも規格に合うようにしてくれます。",
+                },
+                {
+                  name: "高木さん",
+                  rating: 5,
+                  comment: "スマホで撮った写真が完璧な証件照になりました！審査も一発通過で大満足です。",
+                },
+              ].map((review, index) => (
+                <Card key={`duplicate-right-${index}`} className="border-emerald-200 min-w-[300px] flex-shrink-0">
                   <CardContent className="pt-6">
                     <div className="flex items-center mb-4">
                       <div className="flex space-x-1">

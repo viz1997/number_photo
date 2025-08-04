@@ -95,10 +95,10 @@
 /* 滚动动画样式 */
 @keyframes scroll-left {
   0% {
-    transform: translateX(-50%);
+    transform: translateX(0);
   }
   100% {
-    transform: translateX(-150%);
+    transform: translateX(-50%);
   }
 }
 
@@ -107,16 +107,16 @@
     transform: translateX(-50%);
   }
   100% {
-    transform: translateX(50%);
+    transform: translateX(0);
   }
 }
 
 .animate-scroll-left {
-  animation: scroll-left 400s linear infinite;
+  animation: scroll-left 60s linear infinite;
 }
 
 .animate-scroll-right {
-  animation: scroll-right 400s linear infinite;
+  animation: scroll-right 60s linear infinite;
 }
 
 .hover\:pause:hover {
