@@ -26,7 +26,8 @@ export function getR2FileUrl(key: string): string {
     return `${publicDomain}/${key}`
   }
   // Fallback to direct R2 endpoint
-  return `${process.env.R2_ENDPOINT || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`}/${R2_BUCKET_NAME}/${key}`
+  const endpoint = process.env.R2_ENDPOINT || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+  return `${endpoint}/${R2_BUCKET_NAME}/${key}`
 }
 
 // 生成R2公共URL - エイリアス関数
@@ -51,5 +52,6 @@ export async function getAccessibleR2FileUrl(key: string): Promise<string> {
   }
   
   // 使用直接R2端点作为后备
-  return `${process.env.R2_ENDPOINT || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`}/${R2_BUCKET_NAME}/${key}`
+  const endpoint = process.env.R2_ENDPOINT || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+  return `${endpoint}/${R2_BUCKET_NAME}/${key}`
 } 

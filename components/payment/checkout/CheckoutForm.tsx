@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { PaymentElement, AddressElement, useCheckout } from "@stripe/react-stripe-js"
 
 export default function CheckoutForm() {
@@ -8,6 +8,16 @@ export default function CheckoutForm() {
   const [message, setMessage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
+
+  // Prefill email from sessionStorage if present (saved from email dialog in step 2)
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem("email")
+      if (stored && typeof stored === "string") {
+        setEmail(stored)
+      }
+    } catch {}
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,12 +30,27 @@ export default function CheckoutForm() {
     setIsLoading(true)
 
     try {
-      // Update email before confirming
-      await checkout.updateEmail(email)
+      // 仅当创建会话时未传入 customer_email 时，才允许在确认前更新 email，避免 Stripe 报错
+      let providedAtCreation = false
+      try {
+        providedAtCreation = sessionStorage.getItem('emailProvidedAtCheckoutSession') === 'true'
+      } catch {}
+      if (!providedAtCreation) {
+        await checkout.updateEmail(email)
+      }
       
       const confirmResult = await checkout.confirm()
       if (confirmResult.type === "error") {
         setMessage(confirmResult.error.message)
+      } else {
+        // mark payment completed locally and notify parent page to create download token
+        try {
+          sessionStorage.setItem("email", email)
+          sessionStorage.setItem("paymentCompleted", "true")
+        } catch {}
+        try {
+          window.dispatchEvent(new Event("payment-completed"))
+        } catch {}
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Payment failed")

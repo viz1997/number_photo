@@ -12,14 +12,13 @@ import Image from "next/image"
 import { loadStripe } from "@stripe/stripe-js"
 import { CheckoutProvider } from "@stripe/react-stripe-js"
 import CheckoutForm from "@/components/payment/checkout/CheckoutForm"
-import { useDropzone } from "react-dropzone"
+
 import { getAccessibleR2FileUrl } from "@/lib/r2-client"
-import { getPhotoRecord } from "@/lib/supabase"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "")
 
 export default function ProcessPage() {
-  const [isProcessing, setIsProcessing] = useState(true)
+  const [isProcessing, setIsProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
   const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null)
   const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null)
@@ -32,9 +31,6 @@ export default function ProcessPage() {
   const [checkoutInitLoading, setCheckoutInitLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [uploadPreview, setUploadPreview] = useState<string | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
   const autoAdvanceTriedRef = useRef(false)
   const [downloadToken, setDownloadToken] = useState<string | null>(null)
   const [showEmailDialog, setShowEmailDialog] = useState(false)
@@ -42,144 +38,121 @@ export default function ProcessPage() {
   const [pendingProcessRecordId, setPendingProcessRecordId] = useState<string | null>(null)
   const triggerOnceRef = useRef(false)
   const [isInitializing, setIsInitializing] = useState(true)
+  const [isCreatingDownloadToken, setIsCreatingDownloadToken] = useState(false)
 
-  useEffect(() => {
+    useEffect(() => {
     const initializePage = async () => {
-      // 检查是否是从其他页面跳转过来的（通过URL参数或referrer）
-      const isDirectAccess = !document.referrer.includes(window.location.origin) && 
-                            !window.location.search.includes('session_id') &&
-                            !window.location.search.includes('from_upload')
-      
-      // 检查是否有强制重置参数
-      const shouldReset = window.location.search.includes('reset=true')
-      
-      // 如果是直接访问或有重置参数，清除所有session数据并显示上传界面
-      if (isDirectAccess || shouldReset) {
-        console.log('直接访问或强制重置 /process 页面，清除所有session数据')
-        sessionStorage.clear()
-        setIsProcessing(false)
-        setProcessedImageUrl(null)
-        setOriginalImageUrl(null)
-        setWatermarkedImageUrl(null)
-        setError(null)
-        setShowCheckout(false)
-        setCheckoutClientSecret(null)
-        setUploadedFile(null)
-        setUploadPreview(null)
-        setUploadProgress(0)
-        setProgress(0)
-        return
-      }
-
-      // 检查是否从主页上传了文件
+      // 检查是否从首页上传了文件
       const uploadedFileInfo = sessionStorage.getItem("uploadedFileInfo")
-      const uploadInfoRawFromMain = sessionStorage.getItem("uploadInfo")
-      
-      if (uploadedFileInfo && uploadInfoRawFromMain) {
-        console.log('检测到从主页上传的文件，清除processedImageUrl状态并触发上传流程')
-        console.log('清除前的sessionStorage状态:', {
-          processedImageUrl: sessionStorage.getItem("processedImageUrl"),
-          watermarkedImageUrl: sessionStorage.getItem("watermarkedImageUrl"),
-          photoRecordId: sessionStorage.getItem("photoRecordId")
-        })
-        // 清除之前可能存在的处理结果状态
-        setProcessedImageUrl(null)
-        setWatermarkedImageUrl(null)
-        setIsProcessing(false)
-        // 同时清除sessionStorage中的processedImageUrl，确保状态一致
-        sessionStorage.removeItem("processedImageUrl")
-        sessionStorage.removeItem("watermarkedImageUrl")
-        // 清除其他可能影响状态的数据
-        sessionStorage.removeItem("photoRecordId")
-        // 清除错误状态
-        setError(null)
-        console.log('清除后的sessionStorage状态:', {
-          processedImageUrl: sessionStorage.getItem("processedImageUrl"),
-          watermarkedImageUrl: sessionStorage.getItem("watermarkedImageUrl"),
-          photoRecordId: sessionStorage.getItem("photoRecordId")
-        })
-        // ✅ 触发上传流程（使用R2 URL）
-        handleUploadedFileFromMainPage(uploadedFileInfo)
-        setIsInitializing(false)
-        return
-      }
-
-      // 只有在不是从主页上传的情况下，才继续执行后续逻辑
-      // Get original image and record info from sessionStorage
       const uploadInfoRaw = sessionStorage.getItem("uploadInfo")
       const photoRecordId = sessionStorage.getItem("photoRecordId")
       const processedImageUrlFromStorage = sessionStorage.getItem("processedImageUrl")
-      const isPaymentCompleted = sessionStorage.getItem("paymentCompleted")
       
-      // 如果是从主页上传，跳过后续逻辑
-      if (sessionStorage.getItem("uploadedFileInfo")) {
-        console.log('检测到uploadedFileInfo，跳过后续逻辑')
-        setIsInitializing(false)
-        return
-      }
-
-      console.log('从sessionStorage加载数据:', {
-        photoRecordId,
-        processedImageUrlFromStorage,
-        isPaymentCompleted
-      })
-
-      // Clear any existing session data when accessing the page directly
-      // This ensures users always start with a fresh upload flow
-      if (!photoRecordId && !processedImageUrlFromStorage) {
-        // Clear any stale data to ensure clean state
-        sessionStorage.removeItem("previewUrl")
-        sessionStorage.removeItem("uploadInfo")
-        sessionStorage.removeItem("paymentCompleted")
-        sessionStorage.removeItem("pendingDownloadFileKey")
-        setIsProcessing(false)
-        return
-      }
-
-      // Prioritize persistent R2 URL over ephemeral blob URL for original image display
-      if (uploadInfoRaw) {
+      if (uploadedFileInfo && uploadInfoRaw && photoRecordId) {
+        console.log('检测到从首页上传的文件')
+        
+        // 设置原图URL
         try {
           const uploadInfo = JSON.parse(uploadInfoRaw)
           const publicDomain = process.env.NEXT_PUBLIC_R2_PUBLIC_BUCKET_DOMAIN
           if (publicDomain && uploadInfo?.objectKey) {
             const r2Url = `${publicDomain}/${uploadInfo.objectKey}`
             setOriginalImageUrl(r2Url)
-            console.log('使用持久化R2 URL显示原图:', r2Url)
+            console.log('设置原图URL:', r2Url)
+          } else {
+            console.warn('无法设置原图URL，缺少配置:', { publicDomain, objectKey: uploadInfo?.objectKey })
           }
         } catch (e) {
           console.warn('解析 uploadInfo 失败:', e)
         }
-      }
-
-      if (photoRecordId) {
-        // 如果已有处理结果，直接显示
-        if (processedImageUrlFromStorage) {
+        
+        // 设置虚拟的uploadedFile状态
+        try {
+          const fileInfo = JSON.parse(uploadedFileInfo)
+          const virtualFile = new File([], fileInfo.name || 'uploaded-file.jpg', { type: fileInfo.type || 'image/jpeg' })
+          setUploadedFile(virtualFile)
+        } catch (e) {
+          console.warn('创建虚拟File对象失败:', e)
+        }
+        
+        // 检查是否已经有处理结果，但需要确保是当前这次上传的处理结果
+        const currentPhotoRecordId = sessionStorage.getItem("photoRecordId")
+        const storedPhotoRecordId = sessionStorage.getItem("processedPhotoRecordId") // 新增：存储处理结果对应的photoRecordId
+        
+        console.log('检查处理结果匹配:', {
+          currentPhotoRecordId,
+          storedPhotoRecordId,
+          hasProcessedImageUrl: !!processedImageUrlFromStorage,
+          isMatch: storedPhotoRecordId === currentPhotoRecordId
+        })
+        
+        if (processedImageUrlFromStorage && storedPhotoRecordId === currentPhotoRecordId) {
+          console.log('检测到当前上传文件的处理结果，恢复状态')
           setProcessedImageUrl(processedImageUrlFromStorage)
           setIsProcessing(false)
-          // 生成水印预览
+          setProgress(100)
+          
+          // 生成水印版本
           setTimeout(() => {
             generateWatermarkedImage(processedImageUrlFromStorage)
           }, 500)
-          return
+          
+          // 直接设置初始化完成，让后续的useEffect能够触发支付流程
+          setIsInitializing(false)
+          
+          // 延迟一点时间后手动触发支付流程，确保useEffect能正确执行
+          setTimeout(() => {
+            console.log('手动触发支付流程检查')
+            const isPaymentCompleted = sessionStorage.getItem("paymentCompleted")
+            if (isPaymentCompleted !== "true") {
+              console.log('未支付，手动调用initEmbeddedCheckout')
+              initEmbeddedCheckout()
+            }
+          }, 100)
+        } else {
+          // 清除之前的所有处理结果，确保每次都是重新开始
+          console.log('清除之前的处理结果，开始新的处理流程')
+          sessionStorage.removeItem("processedImageUrl")
+          sessionStorage.removeItem("processedPhotoRecordId")
+          sessionStorage.removeItem("paymentCompleted")
+          sessionStorage.removeItem("pendingDownloadFileKey")
+          sessionStorage.removeItem("pendingRetry")
+          // 清除邮箱状态，确保每次都显示邮箱弹窗
+          sessionStorage.removeItem("email")
+          
+          // 重置所有状态，确保每次都是全新的开始
+          setProcessedImageUrl(null)
+          setWatermarkedImageUrl(null)
+          setError(null)
+          setShowCheckout(false)
+          setCheckoutClientSecret(null)
+          setCheckoutError(null)
+          setDownloadToken(null)
+          setIsCreatingDownloadToken(false)
+          autoAdvanceTriedRef.current = false
+          // 如果没有处理结果，开始新的AI处理流程
+          console.log('没有检测到处理结果，开始新的AI处理流程')
+          
+          // 在开始AI处理之前，先显示邮箱弹窗
+          if (!sessionStorage.getItem('email')) {
+            console.log('显示邮箱弹窗，等待用户输入')
+            setShowEmailDialog(true)
+            console.log('showEmailDialog状态设置为true')
+            // 设置pendingProcessRecordId，这样邮箱弹窗关闭后可以继续处理
+            setPendingProcessRecordId(photoRecordId)
+          } else {
+            // 如果已有邮箱，直接开始AI处理
+            console.log('已有邮箱，直接开始AI处理，photoRecordId:', photoRecordId)
+            setIsProcessing(true)
+            setProgress(0)
+            await processImage(photoRecordId)
+          }
         }
-        
-        // 如果没有sessionStorage中的处理结果，尝试从数据库获取
-        console.log('从数据库获取已处理结果...')
-        setIsProcessing(true)
-        const hasResult = await fetchProcessedResultFromDatabase(photoRecordId)
-        if (hasResult) {
-          setIsProcessing(false)
-          return
-        }
-        
-        // 如果数据库中没有结果，说明AI处理还没有完成，需要重新处理
-        console.log('数据库中没有找到已处理结果，需要重新处理')
-        setIsProcessing(false)
-        // 这里可以显示一个提示，告诉用户处理还在进行中
-        setError('AI处理还在进行中，请稍后再試')
       } else {
-        // 如果没有 photoRecordId，说明还没有上传，显示上传界面
-        setIsProcessing(false)
+        // 如果没有从首页上传的文件，重定向到首页
+        console.log('没有检测到从首页上传的文件，重定向到首页')
+        window.location.href = '/'
+        return
       }
       
       setIsInitializing(false)
@@ -188,46 +161,7 @@ export default function ProcessPage() {
     initializePage()
   }, [])
 
-  // 新增：从Supabase获取已处理结果的函数
-  const fetchProcessedResultFromDatabase = async (photoRecordId: string) => {
-    try {
-      console.log('从数据库获取已处理结果...')
-      const photoRecord = await getPhotoRecord(photoRecordId)
-      
-      if (photoRecord && photoRecord.output_image_url) {
-        console.log('找到已处理的结果:', photoRecord.output_image_url)
-        
-        // 设置处理后的图片URL
-        setProcessedImageUrl(photoRecord.output_image_url)
-        sessionStorage.setItem("processedImageUrl", photoRecord.output_image_url)
-        
-        // 设置支付状态
-        if (photoRecord.is_paid) {
-          sessionStorage.setItem("paymentCompleted", "true")
-        }
-        
-        // 生成水印预览
-        setTimeout(() => {
-          if (photoRecord.output_image_url) {
-            generateWatermarkedImage(photoRecord.output_image_url)
-          }
-        }, 500)
-        
-        // 检查支付状态并创建下载token
-        if (photoRecord.output_image_url) {
-          checkPaymentStatusAndCreateToken(photoRecordId, photoRecord.output_image_url)
-        }
-        
-        return true
-      } else {
-        console.log('数据库中没有找到已处理的结果')
-        return false
-      }
-    } catch (error) {
-      console.error('从数据库获取结果失败:', error)
-      return false
-    }
-  }
+
 
   // 新增：检查支付状态并创建下载token的函数
   const checkPaymentStatusAndCreateToken = async (photoRecordId: string, processedImageUrl: string) => {
@@ -292,26 +226,72 @@ export default function ProcessPage() {
           }
           const photoRecordId = sessionStorage.getItem("photoRecordId")
           if (fileKey && photoRecordId) {
-            // 设置支付完成标志
+            // 立即设置支付完成标志，给用户即时反馈
             sessionStorage.setItem("paymentCompleted", "true")
-            // 支付完成后创建下载 token，增加重试以等待后端写入 is_paid
+            
+            // 立即隐藏支付界面，显示成功状态
+            setShowCheckout(false)
+            setCheckoutClientSecret(null)
+            
+         
+            setTimeout(() => {
+         
+              // 如果还在创建下载token，保持加载状态
+              if (!downloadToken) {
+                setIsCreatingDownloadToken(true)
+              }
+            }, 3000)
+            
+            // 开始创建下载token的加载状态
+            setIsCreatingDownloadToken(true)
+            
+            // 发送支付成功邮件
+            const email = sessionStorage.getItem('email')
+            if (email) {
+              try {
+                console.log('发送支付成功邮件:', { email, photoRecordId })
+                const emailRes = await fetch('/api/payment/send-email', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    email,
+                    photoRecordId,
+                    orderId: data?.session?.id,
+                    amount: data?.session?.amount_total ? data.session.amount_total / 100 : undefined
+                  })
+                })
+                
+                if (emailRes.ok) {
+                  const emailData = await emailRes.json()
+                  console.log('邮件发送成功:', emailData)
+                } else {
+                  console.error('邮件发送失败:', emailRes.status)
+                }
+              } catch (emailError) {
+                console.error('发送邮件时出错:', emailError)
+              }
+            }
+            
+            // 支付完成后创建下载 token，优化重试策略
+            setIsCreatingDownloadToken(true)
             const tryCreateToken = async (attempt = 1): Promise<boolean> => {
-            const tokenRes = await fetch('/api/download/create-token', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ fileKey, photoRecordId })
-            })
+              const tokenRes = await fetch('/api/download/create-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileKey, photoRecordId })
+              })
               if (tokenRes.ok) {
-            const tokenData = await tokenRes.json()
+                const tokenData = await tokenRes.json()
                 if (tokenData?.success && tokenData?.token) {
-              sessionStorage.removeItem("pendingDownloadFileKey")
+                  sessionStorage.removeItem("pendingDownloadFileKey")
                   setDownloadToken(tokenData.token)
+                  setIsCreatingDownloadToken(false)
                   return true
                 }
               }
-              if (tokenRes.status === 403 && attempt < 3) {
-                // 等待后端 is_paid 写入生效
-                await new Promise(r => setTimeout(r, 800))
+              if (tokenRes.status === 403 && attempt < 5) {
+                // 减少等待时间，增加重试次数
+                await new Promise(r => setTimeout(r, 300))
                 return tryCreateToken(attempt + 1)
               }
               return false
@@ -320,13 +300,43 @@ export default function ProcessPage() {
             const ok = await tryCreateToken(1)
             if (ok) return
             
-            // If we still can't get the token after retries, show a manual retry option
-            setError("支付已完成，但系统需要一点时间来更新状态。请稍等片刻后点击重试按钮。")
-            // Store the retry info for manual retry
+            // 如果重试后仍然失败，显示自动重试提示
+            setError("支付已完成！系统正在准备下载链接，请稍等片刻...")
+            setIsCreatingDownloadToken(false)
+            // 存储重试信息，并设置自动重试
             sessionStorage.setItem('pendingRetry', JSON.stringify({ fileKey, photoRecordId }))
+            
+            // 5秒后自动重试一次
+            setTimeout(async () => {
+              try {
+                setIsCreatingDownloadToken(true)
+                const retryRes = await fetch('/api/download/create-token', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ fileKey, photoRecordId })
+                })
+                if (retryRes.ok) {
+                  const retryData = await retryRes.json()
+                  if (retryData?.success && retryData?.token) {
+                    sessionStorage.removeItem('pendingRetry')
+                    setError(null)
+                    setDownloadToken(retryData.token)
+                    setIsCreatingDownloadToken(false)
+                    return
+                  }
+                }
+                // 如果自动重试也失败，显示手动重试选项
+                setError("支付已完成，但系统需要一点时间来更新状态。请点击重试按钮。")
+                setIsCreatingDownloadToken(false)
+              } catch (retryError) {
+                setError("支付已完成，但系统需要一点时间来更新状态。请点击重试按钮。")
+                setIsCreatingDownloadToken(false)
+              }
+            }, 5000)
+          } else {
+            // 如果没有获取到必要信息，显示错误
+            setError("支付完成但缺少必要信息，请联系客服")
           }
-          // 如果没有获取到token，显示错误
-          setError("支付完成但无法创建下载链接，请联系客服")
         } else {
           // 支付未完成，显示结账界面
           setShowCheckout(true)
@@ -340,55 +350,61 @@ export default function ProcessPage() {
     handleReturn()
   }, [params])
 
-  // Cleanup blob URLs on unmount
+  // Listen to payment-completed event from embedded checkout and try to create download token immediately
   useEffect(() => {
-    return () => {
-      if (uploadPreview && uploadPreview.startsWith('blob:')) {
-        URL.revokeObjectURL(uploadPreview)
-      }
-    }
-  }, [uploadPreview])
-
-  // 调试：监控processedImageUrl状态变化
-  useEffect(() => {
-    console.log('processedImageUrl状态变化:', {
-      processedImageUrl,
-      isInitializing,
-      pendingProcessRecordId,
-      photoRecordId: sessionStorage.getItem('photoRecordId')
-    })
-  }, [processedImageUrl, isInitializing, pendingProcessRecordId])
-
-  useEffect(() => {
-    // 当处理完成时，自动判断应进入步骤二还是步骤三：
-    // - 若已支付（服务器允许创建下载 token），直接跳到下载页（步骤三）
-    // - 若未支付（403），展示结账（步骤二）
-    if (!processedImageUrl) return
-    if (showCheckout || checkoutClientSecret) return
-    if (autoAdvanceTriedRef.current) return
-    if (isInitializing) return
-
-    const isPaymentCompleted = sessionStorage.getItem("paymentCompleted")
-
-        const resolveFileKey = (url: string) => {
+    const handler = async () => {
+      try {
+        console.log('收到支付完成事件，立即处理...')
+        const fileKey = sessionStorage.getItem('pendingDownloadFileKey') || undefined
+        const photoRecordId = sessionStorage.getItem('photoRecordId') || undefined
+        if (!fileKey || !photoRecordId) return
+        
+        // 立即设置支付完成状态
+        sessionStorage.setItem('paymentCompleted', 'true')
+        setShowCheckout(false)
+        setCheckoutClientSecret(null)
+        
+        // 显示支付成功提示
+ 
+        setTimeout(() => {
+        
+          // 如果还在创建下载token，保持加载状态
+          if (!downloadToken) {
+            setIsCreatingDownloadToken(true)
+          }
+        }, 3000)
+        
+        // 开始创建下载token的加载状态
+        setIsCreatingDownloadToken(true)
+        
+        // 发送支付成功邮件
+        const email = sessionStorage.getItem('email')
+        if (email) {
           try {
-            if (url.startsWith('http')) {
-              return new URL(url).pathname.replace(/^\/+/, '')
+            console.log('支付完成事件 - 发送邮件:', { email, photoRecordId })
+            const emailRes = await fetch('/api/payment/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email,
+                photoRecordId,
+                downloadUrl: window.location.href
+              })
+            })
+            
+            if (emailRes.ok) {
+              const emailData = await emailRes.json()
+              console.log('支付完成事件 - 邮件发送成功:', emailData)
+            } else {
+              console.error('支付完成事件 - 邮件发送失败:', emailRes.status)
             }
-            return url
-          } catch {
-            return url
+          } catch (emailError) {
+            console.error('支付完成事件 - 发送邮件时出错:', emailError)
           }
         }
-
-    const attempt = async () => {
-      autoAdvanceTriedRef.current = true
-        const fileKey = resolveFileKey(processedImageUrl)
-        sessionStorage.setItem('pendingDownloadFileKey', fileKey)
-      const photoRecordId = sessionStorage.getItem('photoRecordId') || undefined
-      if (!photoRecordId) return
-
-      try {
+        
+        // 立即尝试创建下载token
+        setIsCreatingDownloadToken(true)
         const tokenRes = await fetch('/api/download/create-token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -397,265 +413,172 @@ export default function ProcessPage() {
         if (tokenRes.ok) {
           const tokenData = await tokenRes.json()
           if (tokenData?.success && tokenData?.token) {
-            sessionStorage.setItem("paymentCompleted", "true")
-            // Instead of redirecting, render Step 3 content inline
+            console.log('支付完成事件处理成功，设置下载token')
             setDownloadToken(tokenData.token)
+            setIsCreatingDownloadToken(false)
             return
           }
         }
-        if (tokenRes.status === 403) {
-          // 未支付 → 清理误置的支付完成标记并展示结账
-          sessionStorage.removeItem('paymentCompleted')
-          await initEmbeddedCheckout()
+        
+                 // 如果立即创建失败，显示准备中的提示
+         if (tokenRes.status === 403) {
+           setError("支付已完成！系统正在准备下载链接，请稍等片刻...")
+           setIsCreatingDownloadToken(false)
+          // 3秒后自动重试
+          setTimeout(async () => {
+            try {
+              setIsCreatingDownloadToken(true)
+              const retryRes = await fetch('/api/download/create-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileKey, photoRecordId })
+              })
+              if (retryRes.ok) {
+                const retryData = await retryRes.json()
+                if (retryData?.success && retryData?.token) {
+                  setError(null)
+                  setDownloadToken(retryData.token)
+                  setIsCreatingDownloadToken(false)
+                }
+              }
+            } catch {}
+          }, 3000)
         }
-      } catch {
-        // 忽略网络错误，停留在当前页面
+      } catch (error) {
+        console.error('处理支付完成事件时出错:', error)
       }
     }
+    window.addEventListener('payment-completed', handler)
+    return () => window.removeEventListener('payment-completed', handler)
+  }, [])
 
-    attempt()
-  }, [processedImageUrl, showCheckout, checkoutClientSecret])
-
-  // 新增：当pendingProcessRecordId被设置时，自动显示邮箱弹窗
+  // If a download token is obtained, clear any previous error and hide checkout
   useEffect(() => {
-    if (pendingProcessRecordId && !isProcessing && !processedImageUrl && !downloadToken) {
-      // 在步骤二界面显示时，自动显示邮箱弹窗
-      console.log('步骤二界面显示，自动显示邮箱弹窗')
-      setShowEmailDialog(true)
+    if (downloadToken) {
+      setError(null)
+      setShowCheckout(false)
     }
-  }, [pendingProcessRecordId, isProcessing, processedImageUrl, downloadToken])
+  }, [downloadToken])
 
-  const handleFileUpload = async (file: File, options?: { silent?: boolean }) => {
-    if (!file) return
 
-    console.log('=== handleFileUpload 开始 ===')
-    console.log('上传文件:', file.name, file.size, file.type)
-    
-    const silent = options?.silent === true
-    if (!silent) {
-      setIsUploading(true)
-      setUploadProgress(0)
-    }
-    setError(null)
-    
-    let uploadResult: { photoRecordId: string } | undefined
 
-    try {
-      // 创建预览（仅非静默模式）
-      if (!silent) {
-        const previewUrl = URL.createObjectURL(file)
-        setUploadPreview(previewUrl)
-        setOriginalImageUrl(previewUrl)
-      }
+  // 调试：监控processedImageUrl状态变化
+  useEffect(() => {
+    console.log('processedImageUrl状态变化:', {
+      processedImageUrl,
+      isInitializing,
+      photoRecordId: sessionStorage.getItem('photoRecordId')
+    })
+  }, [processedImageUrl, isInitializing])
 
-      // 模拟上传进度（仅非静默模式）
-      let progressInterval: NodeJS.Timeout | undefined
-      if (!silent) {
-        progressInterval = setInterval(() => {
-          setUploadProgress((prev) => {
-            if (prev >= 90) {
-              if (progressInterval) clearInterval(progressInterval)
-              return 90
-            }
-            return prev + 10
-          })
-        }, 200)
-      }
+  // 调试：监控下载token创建状态
+  useEffect(() => {
+    console.log('下载token创建状态变化:', {
+      isCreatingDownloadToken,
+      downloadToken: !!downloadToken,
+    })
+  }, [isCreatingDownloadToken, downloadToken])
 
-      // 准备上传数据
-      const formData = new FormData()
-      formData.append('file', file)
+  // 调试：监控showEmailDialog状态变化
+  useEffect(() => {
+    console.log('showEmailDialog状态变化:', showEmailDialog)
+  }, [showEmailDialog])
 
-      console.log('准备发送 /api/upload 请求...')
-      // 上传文件
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (progressInterval) clearInterval(progressInterval)
-      if (!silent) setUploadProgress(100)
-
-      console.log('upload response status:', response.status)
-      console.log('upload response ok:', response.ok)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.details || 'Upload failed')
-      }
-
-      const data = await response.json()
-      console.log('upload response data:', data)
-      console.log('data.success:', data.success)
-      console.log('data.photoRecordId:', data.photoRecordId)
-      
-      if (data.success && data.photoRecordId) {
-        // 保存到 sessionStorage
-        if (data.photoRecordId) {
-          if (silent) {
-            // 静默模式下，不存储到sessionStorage，只返回ID
-            console.log('静默上传成功，获得photoRecordId:', data.photoRecordId)
-            uploadResult = { photoRecordId: data.photoRecordId }
-          } else {
-            sessionStorage.setItem("photoRecordId", data.photoRecordId)
-            sessionStorage.setItem("previewUrl", uploadPreview || '')
-            console.log('存储 photoRecordId 到 sessionStorage:', data.photoRecordId)
-            console.log('存储 previewUrl 到 sessionStorage:', uploadPreview)
-          }
-        }
-         
-        // 非静默模式下，设置pendingProcessRecordId以显示步骤二界面
-        if (!silent) {
-          // 上传完成后，设置pendingProcessRecordId以显示步骤二界面
-          setPendingProcessRecordId(data.photoRecordId)
-          console.log('上传完成，设置pendingProcessRecordId以显示步骤二界面')
-        }
-      } else {
-        throw new Error('Upload succeeded but no photo record ID received')
-      }
-    } catch (error) {
-      console.error('Upload error:', error)
-      setError(error instanceof Error ? error.message : 'Upload failed')
-      setUploadPreview(null)
-      setOriginalImageUrl(null)
-    } finally {
-      if (!silent) {
-        setIsUploading(false)
-        setUploadProgress(0)
-      }
-      console.log('=== handleFileUpload 结束 ===')
-    }
-    
-    // 静默模式下返回photoRecordId
-    return uploadResult
-  }
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0]
-    if (file) {
-      setUploadedFile(file)
-      handleFileUpload(file)
+  // 清理函数：组件卸载时重置加载状态
+  useEffect(() => {
+    return () => {
+      setIsCreatingDownloadToken(false)
     }
   }, [])
 
-  const validateBlobUrl = async (url: string): Promise<boolean> => {
-    // Blob URLs don't support HEAD reliably; treat as valid within the same session
-    if (url.startsWith('blob:')) return true
-    try {
-      const response = await fetch(url, { method: 'HEAD' })
-      return response.ok
-    } catch {
-      // If HEAD fails (CORS or server limitations), don't block the flow
-      return true
-    }
-  }
-
-  const handleUploadedFileFromMainPage = async (uploadedFileInfo: string) => {
-    console.log('=== handleUploadedFileFromMainPage 开始 ===')
-    console.log('当前状态:', {
-      pendingProcessRecordId,
-      isProcessing,
-      processedImageUrl,
-      originalImageUrl
+  useEffect(() => {
+    // 当处理完成时，自动判断应进入步骤二还是步骤三：
+    // - 若已支付（服务器允许创建下载 token），直接跳到下载页（步骤三）
+    // - 若未支付（403），展示结账（步骤二）
+    console.log('支付流程useEffect触发:', {
+      processedImageUrl: !!processedImageUrl,
+      showCheckout,
+      checkoutClientSecret: !!checkoutClientSecret,
+      autoAdvanceTried: autoAdvanceTriedRef.current,
+      isInitializing
     })
     
-    // 从主页上传完成后进入：直接显示步骤二，自动触发邮箱弹窗
-    // 优先使用持久化R2 URL，而不是临时的blob URL
-    const uploadInfoRaw = sessionStorage.getItem("uploadInfo")
-    if (uploadInfoRaw) {
-      try {
-        const uploadInfo = JSON.parse(uploadInfoRaw)
-        const publicDomain = process.env.NEXT_PUBLIC_R2_PUBLIC_BUCKET_DOMAIN
-        if (publicDomain && uploadInfo?.objectKey) {
-          const r2Url = `${publicDomain}/${uploadInfo.objectKey}`
-          setOriginalImageUrl(r2Url)
-          console.log('使用持久化R2 URL显示原图:', r2Url)
-        } else {
-          console.warn('R2 URL不可用，无法显示原图')
-        }
-      } catch (e) {
-        console.warn('解析 uploadInfo 失败:', e)
-      }
-    }
-    
-    try {
-      const fileInfo = JSON.parse(uploadedFileInfo)
-      // 由于不再有previewUrl，我们需要从uploadInfo创建File对象
-      let file: File | null = null
-      const uploadInfoRaw = sessionStorage.getItem("uploadInfo")
-      if (uploadInfoRaw) {
+    if (!processedImageUrl) return
+    if (showCheckout || checkoutClientSecret) return
+    if (autoAdvanceTriedRef.current) return
+    if (isInitializing) return
+
+    const isPaymentCompleted = sessionStorage.getItem("paymentCompleted")
+    console.log('支付状态检查:', { isPaymentCompleted })
+
+    // 如果已经支付完成，直接尝试创建下载token
+    if (isPaymentCompleted === "true") {
+      const resolveFileKey = (url: string) => {
         try {
-          const uploadInfo = JSON.parse(uploadInfoRaw)
-          if (uploadInfo?.imageUrl) {
-            // 从R2 URL创建File对象
-            const res = await fetch(uploadInfo.imageUrl)
-            if (!res.ok) throw new Error(`Failed to fetch R2 image: ${res.status}`)
-            const blob = await res.blob()
-            file = new File([blob], fileInfo.name, { type: fileInfo.type })
-            setUploadedFile(file)
-            // 不设置uploadPreview，因为我们使用R2 URL
+          if (url.startsWith('http')) {
+            return new URL(url).pathname.replace(/^\/+/, '')
           }
-        } catch (e) {
-          console.warn('从R2 URL创建File对象失败:', e)
+          return url
+        } catch {
+          return url
         }
       }
 
-      // 如果已存在记录ID，直接可处理
-      const existingId = sessionStorage.getItem('photoRecordId')
-      console.log('检查是否已存在photoRecordId:', existingId)
-      if (existingId) {
-        console.log('发现已存在的photoRecordId:', existingId)
-        setPendingProcessRecordId(existingId)
-        // 设置pendingProcessRecordId以显示步骤二界面
-        return
+      const attempt = async () => {
+        autoAdvanceTriedRef.current = true
+        const fileKey = resolveFileKey(processedImageUrl)
+        sessionStorage.setItem('pendingDownloadFileKey', fileKey)
+        const photoRecordId = sessionStorage.getItem('photoRecordId') || undefined
+        if (!photoRecordId) return
+
+        try {
+          setIsCreatingDownloadToken(true)
+          const tokenRes = await fetch('/api/download/create-token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileKey, photoRecordId })
+          })
+          if (tokenRes.ok) {
+            const tokenData = await tokenRes.json()
+            if (tokenData?.success && tokenData?.token) {
+              setDownloadToken(tokenData.token)
+              setIsCreatingDownloadToken(false)
+              return
+            }
+          }
+          if (tokenRes.status === 403) {
+            // 支付状态不一致，清理标记并展示结账
+            sessionStorage.removeItem('paymentCompleted')
+            setIsCreatingDownloadToken(false)
+            await initEmbeddedCheckout()
+          }
+        } catch {
+          // 忽略网络错误，停留在当前页面
+          setIsCreatingDownloadToken(false)
+        }
       }
 
-      // 否则，静默上传一次仅用于创建记录（不显示进度）
-      if (file) {
-        console.log('开始静默上传以创建记录...')
-        const result = await handleFileUpload(file, { silent: true })
-        // 静默上传成功后，直接使用返回的photoRecordId
-        if (result && result.photoRecordId) {
-          console.log('静默上传后获得photoRecordId:', result.photoRecordId)
-          setPendingProcessRecordId(result.photoRecordId)
-          // 设置pendingProcessRecordId以显示步骤二界面
-        }
-      } else {
-        console.warn('无法创建File对象，跳过静默上传')
-        return
-      }
-    } catch (error) {
-      console.error('处理上传文件失败:', error)
-      if (error instanceof Error && error.message.includes('Blob URL is invalid')) {
-        setError('セッションが期限切れになりました。もう一度写真をアップロードしてください。')
-      } else {
-        setError('ファイルの処理に失敗しました。もう一度お試しください。')
-      }
-      setIsProcessing(false)
+      attempt()
+    } else {
+      // 未支付，直接显示支付界面
+      autoAdvanceTriedRef.current = true
+      initEmbeddedCheckout()
     }
-    
-    console.log('=== handleUploadedFileFromMainPage 结束 ===')
-    console.log('最终状态:', {
-      pendingProcessRecordId,
-      isProcessing,
-      processedImageUrl,
-      originalImageUrl
-    })
-    console.log('sessionStorage状态:', {
-      processedImageUrl: sessionStorage.getItem("processedImageUrl"),
-      watermarkedImageUrl: sessionStorage.getItem("watermarkedImageUrl")
-    })
-  }
+  }, [processedImageUrl, showCheckout, checkoutClientSecret, isInitializing])
 
-  // 新增：处理邮箱弹窗的函数，确保无论用户如何操作都会开始AI处理
+
+
+
+
+
+
+
+
+
+
+  // 处理邮箱弹窗的函数
   const handleEmailDialogAction = (action: 'confirm' | 'cancel' | 'close') => {
     console.log('=== handleEmailDialogAction 开始 ===', { action })
-    console.log('当前状态:', {
-      pendingProcessRecordId,
-      photoRecordId: sessionStorage.getItem('photoRecordId'),
-      isProcessing,
-      processedImageUrl
-    })
     
     const email = emailInput.trim()
     if (email) {
@@ -663,48 +586,27 @@ export default function ProcessPage() {
     }
     setShowEmailDialog(false)
     
-    // 无论用户如何操作，都开始AI处理
-    const photoRecordId = pendingProcessRecordId || sessionStorage.getItem('photoRecordId')
-    if (photoRecordId && !isProcessing && !processedImageUrl) {
-      console.log('开始AI处理，photoRecordId:', photoRecordId)
-      setIsProcessing(true)
-      processImage(photoRecordId)
+    // 如果pendingProcessRecordId存在，说明需要继续AI处理
+    if (pendingProcessRecordId && !processedImageUrl) {
+      console.log('邮箱弹窗关闭，继续AI处理，photoRecordId:', pendingProcessRecordId)
       // 清除pendingProcessRecordId，因为AI处理即将开始
       setPendingProcessRecordId(null)
-    } else {
-      console.log('跳过AI处理:', {
-        photoRecordId,
-        isProcessing,
-        processedImageUrl
-      })
+      // 开始AI处理
+      processImage(pendingProcessRecordId)
     }
     
     console.log('=== handleEmailDialogAction 结束 ===')
   }
 
-  const removeFile = () => {
-    // Revoke blob URL to prevent memory leaks
-    if (uploadPreview && uploadPreview.startsWith('blob:')) {
-      URL.revokeObjectURL(uploadPreview)
-    }
-    setUploadedFile(null)
-    setUploadPreview(null)
-    setUploadProgress(0)
-  }
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      "image/jpeg": [".jpg", ".jpeg"],
-      "image/png": [".png"],
-    },
-    maxFiles: 1,
-    maxSize: 7 * 1024 * 1024, // 7MB
-  })
 
   const processImage = async (photoRecordId: string) => {
     console.log('=== processImage 开始 ===')
     console.log('处理记录 ID:', photoRecordId)
+    
+    // 设置处理状态
+    setIsProcessing(true)
+    setProgress(0)
     
     try {
       // Simulate initial progress
@@ -770,13 +672,16 @@ export default function ProcessPage() {
       console.log('data.success:', data.success)
       console.log('data.outputImageUrl:', data.outputImageUrl)
       
-      if (data.success && data.outputImageUrl) {
-        setProcessedImageUrl(data.outputImageUrl)
-        setProgress(100)
-        console.log('处理成功，设置 processedImageUrl:', data.outputImageUrl)
-        
-        // 保存处理后的图片URL到 sessionStorage，避免重复处理
-        sessionStorage.setItem("processedImageUrl", data.outputImageUrl)
+             if (data.success && data.outputImageUrl) {
+         setProcessedImageUrl(data.outputImageUrl)
+         setProgress(100)
+         console.log('处理成功，设置 processedImageUrl:', data.outputImageUrl)
+         
+         // 保存处理后的图片URL和对应的photoRecordId到 sessionStorage，避免重复处理
+         sessionStorage.setItem("processedImageUrl", data.outputImageUrl)
+         sessionStorage.setItem("processedPhotoRecordId", photoRecordId)
+         // 标记初始化完成，以便触发展示 Stripe 或下载的后续逻辑
+         setIsInitializing(false)
         
         // Generate watermarked version
         setTimeout(() => {
@@ -803,6 +708,8 @@ export default function ProcessPage() {
       setError(errorMessage)
     } finally {
       setIsProcessing(false)
+      // 防止初始化标志阻塞后续 useEffect
+      setIsInitializing(false)
       console.log('=== processImage 结束 ===')
     }
   }
@@ -825,32 +732,32 @@ export default function ProcessPage() {
       // Draw the original image
       ctx.drawImage(img, 0, 0)
       
-      // Add watermark
-      ctx.save()
-      
-      // Semi-transparent overlay
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      
-      // Watermark text - draw three labels along diagonal
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
-      const baseFont = Math.max(canvas.width * 0.08, 24)
-      ctx.font = `${baseFont}px Arial, sans-serif`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
+             // Add watermark
+       ctx.save()
+       
+       // Watermark text - draw three labels along diagonal
+       ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+       ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)'
+       ctx.lineWidth = 2
+       const baseFont = Math.max(canvas.width * 0.08, 24)
+       ctx.font = `${baseFont}px Arial, sans-serif`
+       ctx.textAlign = 'center'
+       ctx.textBaseline = 'middle'
 
-      const positions = [
-        { x: canvas.width * 0.25, y: canvas.height * 0.25 },
-        { x: canvas.width * 0.5, y: canvas.height * 0.5 },
-        { x: canvas.width * 0.75, y: canvas.height * 0.75 },
-      ]
-      for (const pos of positions) {
-        ctx.save()
-        ctx.translate(pos.x, pos.y)
-        ctx.rotate(-0.2)
-        ctx.fillText('Preview', 0, 0)
-        ctx.restore()
-      }
+       const positions = [
+         { x: canvas.width * 0.25, y: canvas.height * 0.25 },
+         { x: canvas.width * 0.5, y: canvas.height * 0.5 },
+         { x: canvas.width * 0.75, y: canvas.height * 0.75 },
+       ]
+       for (const pos of positions) {
+         ctx.save()
+         ctx.translate(pos.x, pos.y)
+         ctx.rotate(-0.2)
+         // 先绘制黑色描边，再绘制白色文字，确保在任何背景下都清晰可见
+         ctx.strokeText('Preview', 0, 0)
+         ctx.fillText('Preview', 0, 0)
+         ctx.restore()
+       }
       
       ctx.restore()
       
@@ -864,31 +771,37 @@ export default function ProcessPage() {
       setWatermarkedImageUrl(imageUrl) // Fallback to original
     }
     
-    // Try to get an accessible URL for the image
-    try {
-      // Extract the object key from the imageUrl
-      let objectKey: string | undefined
-      if (imageUrl.includes('/mynumber/')) {
-        // Extract the path after the domain
-        const urlParts = imageUrl.split('/mynumber/')
-        if (urlParts.length > 1) {
-          objectKey = `mynumber/${urlParts[1]}`
-        }
-      }
-      
-      if (objectKey) {
-        // Use the accessible R2 URL function
-        const accessibleUrl = await getAccessibleR2FileUrl(objectKey)
-        console.log('Using accessible R2 URL for watermarking:', accessibleUrl)
-        img.src = accessibleUrl
-      } else {
-        // Fallback to original URL
-        img.src = imageUrl
-      }
-    } catch (error) {
-      console.warn('Failed to get accessible URL, using original:', error)
-      img.src = imageUrl
-    }
+         // Try to get an accessible URL for the image
+     try {
+       // Extract the object key from the imageUrl
+       let objectKey: string | undefined
+       if (imageUrl.includes('/mynumber/')) {
+         // Extract the path after the domain
+         const urlParts = imageUrl.split('/mynumber/')
+         if (urlParts.length > 1) {
+           objectKey = `mynumber/${urlParts[1]}`
+         }
+       }
+       
+       if (objectKey) {
+         // Use the accessible R2 URL function
+         const accessibleUrl = await getAccessibleR2FileUrl(objectKey)
+         console.log('Using accessible R2 URL for watermarking:', accessibleUrl)
+         // 检查URL是否有效
+         if (accessibleUrl && !accessibleUrl.includes('undefined')) {
+           img.src = accessibleUrl
+         } else {
+           console.warn('Invalid accessible URL, using original:', accessibleUrl)
+           img.src = imageUrl
+         }
+       } else {
+         // Fallback to original URL
+         img.src = imageUrl
+       }
+     } catch (error) {
+       console.warn('Failed to get accessible URL, using original:', error)
+       img.src = imageUrl
+     }
   }
 
   const initEmbeddedCheckout = async () => {
@@ -899,6 +812,14 @@ export default function ProcessPage() {
       setShowCheckout(true)
       const photoRecordId = sessionStorage.getItem('photoRecordId')
       const email = sessionStorage.getItem('email') || undefined
+      // 记录本次会话是否在创建 Checkout Session 时就携带了 email
+      try {
+        if (email) {
+          sessionStorage.setItem('emailProvidedAtCheckoutSession', 'true')
+        } else {
+          sessionStorage.removeItem('emailProvidedAtCheckoutSession')
+        }
+      } catch {}
       if (!photoRecordId) {
         setCheckoutError('缺少照片记录ID')
         return
@@ -927,6 +848,7 @@ export default function ProcessPage() {
       setCheckoutError(e instanceof Error ? e.message : '初始化结账失败')
     } finally {
       setCheckoutInitLoading(false)
+      console.log('=== initEmbeddedCheckout 结束 ===')
     }
   }
 
@@ -1012,6 +934,11 @@ export default function ProcessPage() {
     const pendingRetry = sessionStorage.getItem('pendingRetry')
     const canRetry = pendingRetry && error.includes('支付已完成')
     
+    // 如果有错误，确保加载状态被重置
+    if (isCreatingDownloadToken) {
+      setIsCreatingDownloadToken(false)
+    }
+    
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="max-w-md">
@@ -1021,46 +948,51 @@ export default function ProcessPage() {
           <CardContent>
             <p className="text-center text-gray-600 mb-4">{error}</p>
             <div className="space-y-2">
-              {canRetry && (
-                <Button 
-                  onClick={async () => {
-                    try {
-                      setError(null)
-                      const retryData = JSON.parse(pendingRetry)
-                      const { fileKey, photoRecordId } = retryData
-                      
-                      // Try to create download token again
-                      const tokenRes = await fetch('/api/download/create-token', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ fileKey, photoRecordId })
-                      })
-                      
-                      if (tokenRes.ok) {
-                        const tokenData = await tokenRes.json()
-                        if (tokenData?.success && tokenData?.token) {
-                          sessionStorage.removeItem('pendingRetry')
-                          sessionStorage.setItem("paymentCompleted", "true")
-                          setDownloadToken(tokenData.token)
-                          return
-                        }
-                      }
-                      
-                      // If still getting 403, show the error again
-                      if (tokenRes.status === 403) {
-                        setError("まだ支払い状態が更新されていません。もう少し待ってから再試行してください。")
-                      } else {
-                        setError("ダウンロードトークンの作成に失敗しました。")
-                      }
-                    } catch (retryError) {
-                      setError("再試行中にエラーが発生しました。")
-                    }
-                  }} 
-                  className="w-full bg-emerald-600 hover:bg-emerald-700"
-                >
-                  再試行
-                </Button>
-              )}
+                             {canRetry && (
+                 <Button 
+                   onClick={async () => {
+                     try {
+                       setError("正在准备下载链接，请稍等...")
+                       setIsCreatingDownloadToken(true)
+                       const retryData = JSON.parse(pendingRetry)
+                       const { fileKey, photoRecordId } = retryData
+                       
+                       // Try to create download token again
+                       const tokenRes = await fetch('/api/download/create-token', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ fileKey, photoRecordId })
+                       })
+                       
+                       if (tokenRes.ok) {
+                         const tokenData = await tokenRes.json()
+                         if (tokenData?.success && tokenData?.token) {
+                           sessionStorage.removeItem('pendingRetry')
+                           sessionStorage.setItem("paymentCompleted", "true")
+                           setError(null)
+                           setDownloadToken(tokenData.token)
+                           setIsCreatingDownloadToken(false)
+                           return
+                         }
+                       }
+                       
+                       // If still getting 403, show the error again
+                       if (tokenRes.status === 403) {
+                         setError("支付已完成！系统正在准备下载链接，请稍等片刻后再次点击重试。")
+                       } else {
+                         setError("下载链接创建失败，请重试。")
+                       }
+                       setIsCreatingDownloadToken(false)
+                     } catch (retryError) {
+                       setError("重试过程中出现错误，请重试。")
+                       setIsCreatingDownloadToken(false)
+                     }
+                   }} 
+                   className="w-full bg-emerald-600 hover:bg-emerald-700"
+                 >
+                   重试下载
+                 </Button>
+               )}
               <Button 
                 onClick={() => window.history.back()} 
                 className="w-full"
@@ -1087,84 +1019,45 @@ export default function ProcessPage() {
                </div>
                <h1 className="text-xl font-bold text-gray-900">写真処理中</h1>
              </div>
-                           <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // 清除所有session数据
-                    sessionStorage.clear()
-                    // 重置所有状态
-                    setIsProcessing(false)
-                    setProcessedImageUrl(null)
-                    setOriginalImageUrl(null)
-                    setWatermarkedImageUrl(null)
-                    setError(null)
-                    setShowCheckout(false)
-                    setCheckoutClientSecret(null)
-                    setUploadedFile(null)
-                    setUploadPreview(null)
-                    setUploadProgress(0)
-                    setProgress(0)
-                    setDownloadToken(null)
-                    setShowEmailDialog(false)
-                    setEmailInput("")
-                    setPendingProcessRecordId(null)
-                    // 重置refs
-                    autoAdvanceTriedRef.current = false
-                    triggerOnceRef.current = false
-                  }}
-                  className="text-emerald-600 hover:text-emerald-700 border-emerald-300 hover:border-emerald-400"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  重新上传处理
-                </Button>
-             <Button
-               variant="outline"
-               onClick={() => window.location.href = '/'}
-               className="text-gray-600 hover:text-gray-900"
-             >
-               ホームに戻る
-             </Button>
-              </div>
+                                                       <div className="flex items-center space-x-2">
+                     
+              <Button
+                variant="outline"
+                onClick={() => window.location.href = '/'}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                ホーム
+              </Button>
+               </div>
            </div>
          </div>
        </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Unified Progress Steps (3 steps) */}
+             <div className="container mx-auto px-4 py-8">
+         <div className="max-w-4xl mx-auto">
+        
+           
+           {/* Unified Progress Steps (2 steps) */}
           <div className="flex items-center justify-center mb-8">
             <div className="flex items-center space-x-4">
-              {/* Step 1: アップロード */}
-              <div className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-                  uploadedFile || originalImageUrl ? 'bg-emerald-600 text-white' : 'bg-gray-300 text-gray-500'
-                }`}>
-                  {uploadedFile || originalImageUrl ? <CheckCircle className="w-4 h-4" /> : '1'}
-                </div>
-                <span className={`ml-2 font-semibold ${uploadedFile || originalImageUrl ? 'text-emerald-600' : 'text-gray-500'}`}>アップロード</span>
-              </div>
-
-              <div className={`w-8 h-px ${isProcessing || processedImageUrl ? 'bg-emerald-600' : 'bg-gray-300'}`}></div>
-
-              {/* Step 2: 処理・支払い */}
+              {/* Step 1: 処理・支払い */}
               <div className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
                   isProcessing ? 'bg-emerald-600 text-white' : processedImageUrl ? 'bg-emerald-600 text-white' : 'bg-gray-300 text-gray-500'
                 }`}>
-                  {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : processedImageUrl ? <CheckCircle className="w-4 h-4" /> : '2'}
+                  {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : processedImageUrl ? <CheckCircle className="w-4 h-4" /> : '1'}
                 </div>
                 <span className={`ml-2 font-semibold ${processedImageUrl ? 'text-emerald-600' : isProcessing ? 'text-emerald-600' : 'text-gray-500'}`}>処理・支払い</span>
               </div>
 
               <div className={`w-8 h-px ${downloadToken ? 'bg-emerald-600' : 'bg-gray-300'}`}></div>
 
-              {/* Step 3: ダウンロード */}
+              {/* Step 2: ダウンロード */}
               <div className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
                   downloadToken ? 'bg-emerald-600 text-white' : 'bg-gray-300 text-gray-500'
                 }`}>
-                  {downloadToken ? <CheckCircle className="w-4 h-4" /> : '3'}
+                  {downloadToken ? <CheckCircle className="w-4 h-4" /> : '2'}
                 </div>
                 <span className={`ml-2 font-semibold ${downloadToken ? 'text-emerald-600' : 'text-gray-500'}`}>ダウンロード</span>
               </div>
@@ -1173,144 +1066,7 @@ export default function ProcessPage() {
 
       
 
-          {!uploadedFile && !originalImageUrl && !pendingProcessRecordId ? (
-            // 上传界面
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-center">写真をアップロード</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div
-                  {...getRootProps()}
-                  className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                    isDragActive
-                      ? 'border-emerald-500 bg-emerald-50'
-                      : 'border-gray-300 hover:border-emerald-400 hover:bg-gray-50'
-                  }`}
-                >
-                  <input {...getInputProps()} />
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-lg font-semibold text-gray-700 mb-2">
-                    {isDragActive ? "ここにファイルをドロップしてください" : "ファイルをドラッグ&ドロップ"}
-                  </p>
-                  <p className="text-gray-500 mb-4">または</p>
-                  <Button variant="outline" className="mb-4 bg-transparent">
-                    ファイルを選択
-                  </Button>
-                  <div className="text-sm text-gray-500 space-y-1">
-                    <p>対応形式: JPG, PNG</p>
-                    <p>最大ファイルサイズ: 7MB</p>
-                    <p>推奨解像度: 480×480ピクセル以上</p>
-                  </div>
-                </div>
-
-                {/* Requirements */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start space-x-2">
-                    <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-blue-800 mb-2">写真の要件</h4>
-                      <ul className="text-sm text-blue-700 space-y-1">
-                        <li>• 最近6ヶ月以内に撮影された写真</li>
-                        <li>• 正面を向いて、無帽、無背景</li>
-                        <li>• 顔がはっきりと写っているもの</li>
-                        <li>• 影や反射がないもの</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ) : isUploading ? (
-            // 上传进度界面
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-center">写真をアップロード中...</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="text-center">
-                  <Loader2 className="w-16 h-16 text-emerald-600 animate-spin mx-auto mb-4" />
-                  <p className="text-gray-600 mb-4">ファイルをサーバーにアップロード中です</p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>アップロード進行状況</span>
-                      <span>{uploadProgress}%</span>
-                    </div>
-                    <Progress value={uploadProgress} className="w-full" />
-                  </div>
-                </div>
-
-                {uploadPreview && (
-                  <div className="text-center">
-                    <div className="text-sm text-gray-600 mb-2">アップロード中の写真</div>
-                    <div className="relative w-48 h-48 bg-white border-2 border-gray-200 rounded-lg flex items-center justify-center overflow-hidden mx-auto">
-                      <Image
-                        src={uploadPreview}
-                        alt="アップロード中の写真"
-                        width={192}
-                        height={192}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-          ) : pendingProcessRecordId && !isProcessing && !processedImageUrl ? (
-            // 从主页上传完成后，直接显示Step 2界面（等待AI处理开始）
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-center text-emerald-600">
-                    <CheckCircle className="w-6 h-6 inline mr-2" />
-                    写真処理の準備完了
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {/* Original Image */}
-                    <div className="text-center">
-                      <h3 className="font-semibold mb-4">アップロードされた写真</h3>
-                      <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
-                        {originalImageUrl && (
-                          <Image
-                            src={originalImageUrl}
-                            alt="アップロードされた写真"
-                            width={250}
-                            height={250}
-                            className="mx-auto rounded object-cover"
-                          />
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Processing Status */}
-                    <div className="text-center">
-                      <h3 className="font-semibold mb-4">処理状況</h3>
-                      <div className="border-2 border-emerald-200 rounded-lg p-4 bg-emerald-50 flex items-center justify-center h-[250px]">
-                        <div className="text-center">
-                          <Loader2 className="w-12 h-12 text-emerald-600 animate-spin mx-auto mb-4" />
-                          <p className="text-emerald-700">AI処理の準備中...</p>
-                          <p className="text-sm text-emerald-600 mt-2">メールアドレスを入力してください</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h4 className="font-semibold text-blue-800 mb-2">次のステップ</h4>
-                    <div className="text-sm text-blue-700 space-y-1">
-                      <p>• メールアドレスを入力（任意）</p>
-                      <p>• AI処理を開始</p>
-                      <p>• 写真の調整と最適化</p>
-                      <p>• お支払いとダウンロード</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          ) : isProcessing ? (
+          {isProcessing ? (
             <Card>
               <CardHeader>
                 <CardTitle className="text-center">写真を処理しています...</CardTitle>
@@ -1562,22 +1318,15 @@ export default function ProcessPage() {
                            </CardContent>
                          </Card>
                        </div>
-                     ) : (
+                     ) : processedImageUrl ? (
                        // Step 2: 处理完成但未支付
             <div className="space-y-6">
-              {/* 调试信息 */}
-              {process.env.NODE_ENV === 'development' && (
-                <div className="bg-yellow-100 border border-yellow-300 rounded p-2 text-xs text-yellow-800">
-                  <strong>调试信息:</strong> processedImageUrl = {String(processedImageUrl)}, 
-                  isInitializing = {String(isInitializing)}, 
-                  pendingProcessRecordId = {String(pendingProcessRecordId)}
-                </div>
-              )}
+         
               <Card>
                 <CardHeader>
                   <CardTitle className="text-center text-emerald-600">
                     <CheckCircle className="w-6 h-6 inline mr-2" />
-                    {processedImageUrl ? '処理完了' : '写真処理の準備完了'}
+                    処理完了
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1598,100 +1347,37 @@ export default function ProcessPage() {
                       </div>
                     </div>
 
-                    {/* Processed Image or Processing Status */}
+                    {/* Processed Image */}
                     <div className="text-center">
-                      <h3 className="font-semibold mb-4">
-                        {processedImageUrl ? '処理後の写真' : '処理状況'}
-                      </h3>
+                      <h3 className="font-semibold mb-4">処理後の写真</h3>
                       <div className="border-2 border-emerald-200 rounded-lg p-4 bg-emerald-50 relative">
-                        {processedImageUrl ? (
-                          watermarkedImageUrl && (
-                            <Image
-                              src={watermarkedImageUrl}
-                              alt="処理後の写真"
-                              width={250}
-                              height={250}
-                              className="mx-auto rounded object-cover"
-                            />
-                          )
-                        ) : (
-                          <div className="flex items-center justify-center h-[250px]">
-                            <div className="text-center">
-                              <Loader2 className="w-12 h-12 text-emerald-600 animate-spin mx-auto mb-4" />
-                              <p className="text-emerald-700">AI処理の準備中...</p>
-                              <p className="text-sm text-emerald-600 mt-2">メールアドレスを入力してください</p>
-                            </div>
-                          </div>
+                        {watermarkedImageUrl && (
+                          <Image
+                            src={watermarkedImageUrl}
+                            alt="処理後の写真"
+                            width={250}
+                            height={250}
+                            className="mx-auto rounded object-cover"
+                          />
                         )}
-                      </div>
-                      {processedImageUrl && (
                         <p className="text-sm text-gray-600 mt-2">※プレビューにはウォーターマークが表示されます</p>
-                      )}
+                      </div>
                     </div>
                   </div>
 
                   <div className="mt-6 bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                    <h4 className="font-semibold text-emerald-800 mb-2">
-                      {processedImageUrl ? '調整内容' : '次のステップ'}
-                    </h4>
-                    {processedImageUrl ? (
-                      <div className="grid md:grid-cols-2 gap-4 text-sm text-emerald-700">
-                        <div>
-                          <p>• 背景: 無地白色に調整</p>
-                          <p>• サイズ: 4.5cm × 3.5cm (規格準拠)</p>
-                        </div>
-                        <div>
-                          <p>• 解像度: 300dpi (高画質)</p>
-                          <p>• ファイル形式: JPEG</p>
-                        </div>
+                    <h4 className="font-semibold text-emerald-800 mb-2">調整内容</h4>
+                    <div className="grid md:grid-cols-2 gap-4 text-sm text-emerald-700">
+                      <div>
+                        <p>• 背景: 無地白色に調整</p>
+                        <p>• サイズ: 4.5cm × 3.5cm (規格準拠)</p>
                       </div>
-                    ) : (
-                      <div className="text-sm text-emerald-700 space-y-1">
-                        <p>• メールアドレスを入力（任意）</p>
-                        <p>• AI処理を開始</p>
-                        <p>• 写真の調整と最適化</p>
-                        <p>• お支払いとダウンロード</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Email Dialog for Step 2 - AI处理前 */}
-                  {showEmailDialog && !processedImageUrl && (
-                    <div className="mt-6">
-                      <div className="bg-white border border-gray-200 rounded-lg p-6">
-                        <div className="text-center mb-4">
-                          <h3 className="text-lg font-semibold text-gray-900">メールアドレス（任意）</h3>
-                          <p className="text-sm text-gray-600 mt-1">
-                            入力しなくても続行できます。入力すると決済用に自動入力されます。
-                          </p>
-                        </div>
-                        <div className="space-y-4">
-                          <Input
-                            type="email"
-                            placeholder="メールアドレスを入力（任意）"
-                            value={emailInput}
-                            onChange={(e) => setEmailInput(e.target.value)}
-                            className="w-full"
-                          />
-                          <div className="flex space-x-3">
-                            <Button
-                              variant="outline"
-                              onClick={() => handleEmailDialogAction('cancel')}
-                              className="flex-1"
-                            >
-                              入力せず続行
-                            </Button>
-                            <Button
-                              onClick={() => handleEmailDialogAction('confirm')}
-                              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
-                            >
-                              確認して続行
-                            </Button>
-                          </div>
-                        </div>
+                      <div>
+                        <p>• 解像度: 300dpi (高画質)</p>
+                        <p>• ファイル形式: JPEG</p>
                       </div>
                     </div>
-                  )}
+                  </div>
 
                   {/* Embedded Checkout inside main result card (Step 2) */}
                   {showCheckout && (
@@ -1722,12 +1408,65 @@ export default function ProcessPage() {
                 </CardContent>
               </Card>
             </div>
-          )}
+                      ) : null
+          }
         </div>
       </div>
       
+      {/* Email Dialog as modal over step 2 processing background */}
+      <Dialog open={showEmailDialog} onOpenChange={(open) => { if (!open) handleEmailDialogAction('close') }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>メールアドレス（任意）</DialogTitle>
+            <DialogDescription>入力しなくても続行できます。入力すると決済用に自動入力されます。</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              type="email"
+              placeholder="メールアドレスを入力（任意）"
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => handleEmailDialogAction('cancel')}>入力せず続行</Button>
+            <Button onClick={() => handleEmailDialogAction('confirm')} className="bg-emerald-600 hover:bg-emerald-700 text-white">確認して続行</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Hidden canvas for watermark generation */}
       <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+      {/* Loading Overlay for Download Token Creation */}
+      {isCreatingDownloadToken && (
+        <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+          <div className="text-center">
+            <div className="relative mb-6">
+              <Loader2 className="w-20 h-20 text-emerald-600 animate-spin mx-auto" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-10 h-10 bg-emerald-100 rounded-full"></div>
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">ダウンロード準備中</h3>
+            <p className="text-gray-600 mb-8 text-lg leading-relaxed">
+              支払い完了後、ダウンロードリンクを作成しています。<br />
+              しばらくお待ちください...
+            </p>
+            <div className="space-y-4">
+              <div className="w-64 bg-gray-200 rounded-full h-4 overflow-hidden mx-auto">
+                <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-4 rounded-full animate-pulse" style={{ width: '70%' }}></div>
+              </div>
+              <div className="flex justify-center space-x-2">
+                <div className="w-3 h-3 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-3 h-3 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-3 h-3 bg-emerald-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
