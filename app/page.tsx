@@ -197,129 +197,186 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* 移动端：照片在上方，交互区在下方居中 */}
-            <div className="lg:grid lg:grid-cols-3 lg:gap-12 lg:items-start">
-              {/* 照片对比区域 - 移动端在上方，桌面端在左侧 */}
-              <div className="order-1 lg:order-1 lg:col-span-2 mb-8 lg:mb-0">
-                <div className="flex items-center justify-center space-x-4 lg:space-x-6 h-[380px] pt-4">
-                  {/* 处理前图片 */}
-                  <div className="text-center flex flex-col items-center justify-center h-full">
-                    <div className="relative">
-                      <Image
-                        src="/my-number-card-photo-sample.webp"
-                        alt="処理前の写真"
-                        width={380}
-                        height={260}
-                        className="lg:w-[320px] lg:h-[380px] rounded-lg object-cover border-2 border-red-200"
-                        style={{ aspectRatio: '35/45' }}
-                      />
-
-                    </div>
-                    <p className="text-xs text-gray-600 mt-2">元の写真</p>
-                  </div>
-                  
-                  {/* 箭头 */}
-                  <div className="text-3xl lg:text-4xl text-emerald-600">➡️</div>
-                  
-                  {/* 处理后图片 */}
-                  <div className="text-center flex flex-col items-center justify-center h-full">
-                    <div className="relative">
-                      <Image
-                        src="/my-number-card-photo-sample2.webp"
-                        alt="処理後の写真"
-                        width={380}
-                        height={260}
-                        className="lg:w-[320px] lg:h-[380px] rounded-lg object-cover border-2 border-emerald-200"
-                        style={{ aspectRatio: '35/45' }}
-                      />
-                      <div className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-                        規格適合
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600 mt-2">AI処理後</p>
-                  </div>
-                </div>
+            {/* 左右结构的内容区域 */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* 左侧：处理前图片 */}
+              <div className="order-2 lg:order-1">
+                <Image
+                  src="/my-number-card-photo-before1.webp"
+                  alt="処理前の写真"
+                  width={400}
+                  height={400}
+                  className="rounded-lg object-cover"
+                />
               </div>
 
-              {/* 上传功能区域 - 移动端在下方居中，桌面端在右侧 */}
-              <div className="order-2 lg:order-2 flex justify-center lg:justify-start lg:items-start">
-                <Card className="w-full max-w-md lg:max-w-none border-2 border-emerald-200 h-[380px] flex flex-col">
-                  <CardHeader className="pb-3 flex-shrink-0 pt-4">
-                    <CardTitle className="text-center text-lg">写真を選択してください</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 flex-1 flex flex-col">
-                    {!uploadedFile ? (
-                      <div
-                        {...getRootProps()}
-                        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors flex-1 flex flex-col items-center justify-center ${
-                          isDragActive ? "border-emerald-500 bg-emerald-50" : "border-gray-300 hover:border-emerald-400"
-                        }`}
-                      >
-                        <input {...getInputProps()} />
-                        <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                        <p className="text-base font-semibold text-gray-700 mb-2">
-                          {isDragActive ? "ここにファイルをドロップしてください" : "ファイルをドラッグ&ドロップ"}
-                        </p>
-                        <p className="text-gray-500 mb-3">または</p>
-                        <Button variant="outline" className="mb-3 bg-transparent text-sm">
-                          ファイルを選択
-                        </Button>
-                        <div className="text-xs text-gray-500 space-y-1">
-                          <p>対応形式: JPG, PNG | 最大: 7MB</p>
+              {/* 右侧：上传功能 */}
+              <div className="order-1 lg:order-2">
+                {currentStep === "upload" && (
+                  <Card className="border-2 border-emerald-200">
+                    <CardHeader>
+                      <CardTitle className="text-center">写真を選択してください</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {!uploadedFile ? (
+                        <div
+                          {...getRootProps()}
+                          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                            isDragActive ? "border-emerald-500 bg-emerald-50" : "border-gray-300 hover:border-emerald-400"
+                          }`}
+                        >
+                          <input {...getInputProps()} />
+                          <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                          <p className="text-lg font-semibold text-gray-700 mb-2">
+                            {isDragActive ? "ここにファイルをドロップしてください" : "ファイルをドラッグ&ドロップ"}
+                          </p>
+                          <p className="text-gray-500 mb-4">または</p>
+                          <Button variant="outline" className="mb-4 bg-transparent">
+                            ファイルを選択
+                          </Button>
+                          <div className="text-sm text-gray-500 space-y-1">
+                            <p>対応形式: JPG, PNG | 最大: 7MB</p>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-3 flex-1 flex flex-col">
-                        <div className="text-center flex-1 flex flex-col items-center justify-center">
-                          {previewUrl && (
-                            <div className="relative">
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="text-center">
+                            {previewUrl && (
                               <Image
                                 src={previewUrl || "/placeholder.svg"}
                                 alt="アップロード写真"
-                                width={200}
-                                height={200}
+                                width={150}
+                                height={150}
                                 className="mx-auto rounded object-cover border-2 border-gray-200"
-                                style={{ aspectRatio: '1/1' }}
                               />
-                              {isUploading && (
-                                <div className="absolute inset-0 bg-black bg-opacity-30 rounded flex items-center justify-center">
-                                  <div className="text-white text-center">
-                                    <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                                    <p className="text-sm">アップロード中...</p>
-                                  </div>
-                                </div>
-                              )}
+                            )}
+                          </div>
+                          {isUploading && (
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span>アップロード中...</span>
+                                <span>{uploadProgress}%</span>
+                              </div>
+                              <Progress value={uploadProgress} />
                             </div>
                           )}
                         </div>
-                        {isUploading && (
-                          <div className="space-y-2 flex-shrink-0">
-                            <div className="flex justify-between text-sm">
-                              <span>アップロード中...</span>
-                              <span>{uploadProgress}%</span>
-                            </div>
-                            <Progress value={uploadProgress} />
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {currentStep === "processing" && (
+                  <Card className="border-2 border-emerald-200">
+                    <CardHeader>
+                      <CardTitle className="text-center">AI処理中...</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="text-center">
+                        <Loader2 className="w-16 h-16 text-emerald-600 animate-spin mx-auto mb-4" />
+                        <p className="text-gray-600 mb-4">最新AI技術でマイナンバーカード規格に調整中</p>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>処理進行状況</span>
+                            <span>{processingProgress}%</span>
                           </div>
-                        )}
-                        {!isUploading && uploadProgress === 100 && (
-                          <div className="text-center space-y-2 flex-shrink-0">
-                            <CheckCircle className="w-8 h-8 text-emerald-600 mx-auto" />
-                            <p className="text-sm text-emerald-600 font-medium">アップロード完了！</p>
-                            <p className="text-xs text-gray-500">AI処理の準備中...</p>
-                          </div>
-                        )}
-                        {error && (
-                          <div className="text-center space-y-2 flex-shrink-0">
-                            <p className="text-sm text-red-600 font-medium">{error}</p>
-                            <Button onClick={resetProcess} variant="outline" size="sm">
-                              再試行
-                            </Button>
-                          </div>
-                        )}
+                          <Progress value={processingProgress} />
+                        </div>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {currentStep === "payment" && (
+                  <Card className="border-2 border-emerald-200">
+                    <CardHeader>
+                      <CardTitle className="text-center text-emerald-600">
+                        <CheckCircle className="w-6 h-6 inline mr-2" />
+                        処理完了！
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid md:grid-cols-2 gap-6 mb-6">
+                        <div className="text-center">
+                          <h3 className="font-semibold mb-4">元の写真</h3>
+                          {previewUrl && (
+                            <Image
+                              src={previewUrl || "/placeholder.svg"}
+                              alt="元の写真"
+                              width={200}
+                              height={200}
+                              className="mx-auto rounded object-cover border-2 border-gray-200"
+                            />
+                          )}
+                        </div>
+                        <div className="text-center">
+                          <h3 className="font-semibold mb-4">処理後の写真</h3>
+                          <div className="relative">
+                            {processedUrl && (
+                              <>
+                                <Image
+                                  src={processedUrl || "/placeholder.svg"}
+                                  alt="処理後の写真"
+                                  width={200}
+                                  height={200}
+                                  className="mx-auto rounded object-cover border-2 border-emerald-200"
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <div className="bg-black bg-opacity-50 text-white px-4 py-2 rounded text-sm font-semibold transform rotate-12">
+                                    SAMPLE
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <Button
+                          onClick={() => setShowPaymentDialog(true)}
+                          size="lg"
+                          className="bg-emerald-600 hover:bg-emerald-700"
+                        >
+                          <CreditCard className="w-5 h-5 mr-2" />
+                          ¥500で高画質版をダウンロード
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {currentStep === "download" && (
+                  <Card className="border-2 border-emerald-200 bg-emerald-50">
+                    <CardHeader>
+                      <CardTitle className="text-center text-emerald-600">
+                        <CheckCircle className="w-6 h-6 inline mr-2" />
+                        ダウンロード準備完了！
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="text-center">
+                        {processedUrl && (
+                          <Image
+                            src={processedUrl || "/placeholder.svg"}
+                            alt="完成した写真"
+                            width={300}
+                            height={300}
+                            className="mx-auto rounded object-cover border-2 border-emerald-200"
+                          />
+                        )}
+                        <p className="text-sm text-gray-600 mt-4 mb-4">マイナンバーカード申請規格準拠・高画質JPEG写真</p>
+                        <Button onClick={handleDownload} size="lg" className="bg-emerald-600 hover:bg-emerald-700 mr-4">
+                          <Download className="w-5 h-5 mr-2" />
+                          高画質写真をダウンロード
+                        </Button>
+                        <Button onClick={resetProcess} variant="outline" size="lg">
+                          <RefreshCw className="w-5 h-5 mr-2" />
+                          新しい写真を処理
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </div>
           </div>
