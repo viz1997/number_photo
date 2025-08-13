@@ -3,53 +3,43 @@
 import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
   Upload,
-  Camera,
-  CreditCard,
   Download,
   CheckCircle,
   Shield,
-  HelpCircle,
   Star,
-  Loader2,
   RefreshCw,
   Users,
-  Award,
   Clock,
   Zap,
   ExternalLink,
+  Loader2,
 } from "lucide-react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function HomePage() {
-  const [currentStep, setCurrentStep] = useState<"upload" | "processing" | "payment" | "download">("upload")
+  const router = useRouter()
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [processedUrl, setProcessedUrl] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
-  const [processingProgress, setProcessingProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false)
-  const [email, setEmail] = useState("")
-  const [isPaymentProcessing, setIsPaymentProcessing] = useState(false)
-  const [downloadToken, setDownloadToken] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
     if (file) {
       setUploadedFile(file)
       const url = URL.createObjectURL(file)
       setPreviewUrl(url)
-      simulateUpload()
+      
+      // 开始真实上传
+      await handleRealUpload(file, url)
     }
   }, [])
 
@@ -63,74 +53,89 @@ export default function HomePage() {
     maxSize: 7 * 1024 * 1024,
   })
 
-  const simulateUpload = () => {
+  const handleRealUpload = async (file: File, previewUrl: string) => {
     setIsUploading(true)
     setUploadProgress(0)
+    setError(null)
 
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setIsUploading(false)
-          setCurrentStep("processing")
-          simulateProcessing()
-          return 100
-        }
-        return prev + 10
+    try {
+      // 模拟上传进度
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval)
+            return 90
+          }
+          return prev + 10
+        })
+      }, 200)
+
+      // 准备上传数据
+      const formData = new FormData()
+      formData.append('file', file)
+
+      // 上传文件
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
       })
-    }, 200)
-  }
 
-  const simulateProcessing = () => {
-    setIsProcessing(true)
-    setProcessingProgress(0)
+      clearInterval(progressInterval)
+      setUploadProgress(100)
 
-    const interval = setInterval(() => {
-      setProcessingProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setIsProcessing(false)
-          setProcessedUrl("/placeholder.svg?height=400&width=400")
-          setCurrentStep("payment")
-          return 100
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.details || 'Upload failed')
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        // 保存文件信息到 sessionStorage
+        const fileInfo = {
+          name: file.name,
+          type: file.type,
+          size: file.size
         }
-        return prev + 3
-      })
-    }, 300)
-  }
-
-  const handlePayment = async () => {
-    if (!email) {
-      alert("メールアドレスを入力してください")
-      return
+        sessionStorage.setItem("uploadedFileInfo", JSON.stringify(fileInfo))
+        if (data.photoRecordId) {
+          sessionStorage.setItem("photoRecordId", data.photoRecordId)
+        }
+        // 额外保存上传返回信息，便于 /process 使用R2稳定URL回退
+        try {
+          const uploadInfo = { fileId: data.fileId, fileName: data.fileName, imageUrl: data.imageUrl, objectKey: data.imageUrl ? new URL(data.imageUrl).pathname.replace(/^\/+/, '') : undefined }
+          sessionStorage.setItem("uploadInfo", JSON.stringify(uploadInfo))
+        } catch {}
+        
+        // 上传完成后，重定向到 process 页面
+        setTimeout(() => {
+          router.push('/process')
+        }, 1000) // 给用户1秒时间看到上传完成
+      } else {
+        throw new Error('Upload succeeded but backend returned success=false')
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      setError(error instanceof Error ? error.message : 'Upload failed')
+      setPreviewUrl(null)
+    } finally {
+      setIsUploading(false)
+      setUploadProgress(0)
     }
-
-    setIsPaymentProcessing(true)
-
-    setTimeout(() => {
-      setIsPaymentProcessing(false)
-      setShowPaymentDialog(false)
-      setDownloadToken(Math.random().toString(36).substring(2, 15))
-      setCurrentStep("download")
-    }, 3000)
   }
 
-  const handleDownload = () => {
-    const link = document.createElement("a")
-    link.href = "/placeholder.svg?height=600&width=600"
-    link.download = "mynumber-photo.jpg"
-    link.click()
+  const removeFile = () => {
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl)
+    }
+    setUploadedFile(null)
+    setPreviewUrl(null)
+    setUploadProgress(0)
+    setError(null)
   }
 
   const resetProcess = () => {
-    setCurrentStep("upload")
-    setUploadedFile(null)
-    setPreviewUrl(null)
-    setProcessedUrl(null)
-    setUploadProgress(0)
-    setProcessingProgress(0)
-    setEmail("")
-    setDownloadToken("")
+    removeFile()
   }
 
   return (
@@ -193,12 +198,12 @@ export default function HomePage() {
             </div>
 
             {/* 移动端：照片在上方，交互区在下方居中 */}
-            <div className="lg:grid lg:grid-cols-3 lg:gap-12 lg:items-center">
+            <div className="lg:grid lg:grid-cols-3 lg:gap-12 lg:items-start">
               {/* 照片对比区域 - 移动端在上方，桌面端在左侧 */}
               <div className="order-1 lg:order-1 lg:col-span-2 mb-8 lg:mb-0">
-                <div className="flex items-center justify-center space-x-4 lg:space-x-6">
+                <div className="flex items-center justify-center space-x-4 lg:space-x-6 h-[380px] pt-4">
                   {/* 处理前图片 */}
-                  <div className="text-center">
+                  <div className="text-center flex flex-col items-center justify-center h-full">
                     <div className="relative">
                       <Image
                         src="/my-number-card-photo-sample.webp"
@@ -217,7 +222,7 @@ export default function HomePage() {
                   <div className="text-3xl lg:text-4xl text-emerald-600">➡️</div>
                   
                   {/* 处理后图片 */}
-                  <div className="text-center">
+                  <div className="text-center flex flex-col items-center justify-center h-full">
                     <div className="relative">
                       <Image
                         src="/my-number-card-photo-sample2.webp"
@@ -237,174 +242,84 @@ export default function HomePage() {
               </div>
 
               {/* 上传功能区域 - 移动端在下方居中，桌面端在右侧 */}
-              <div className="order-2 lg:order-2 flex justify-center lg:justify-start lg:items-center">
-                {currentStep === "upload" && (
-                  <Card className="w-full max-w-md lg:max-w-none border-2 border-emerald-200 max-h-[350px] overflow-y-auto">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-center text-lg">写真を選択してください</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4">
-                      {!uploadedFile ? (
-                        <div
-                          {...getRootProps()}
-                          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                            isDragActive ? "border-emerald-500 bg-emerald-50" : "border-gray-300 hover:border-emerald-400"
-                          }`}
-                        >
-                          <input {...getInputProps()} />
-                          <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                          <p className="text-base font-semibold text-gray-700 mb-2">
-                            {isDragActive ? "ここにファイルをドロップしてください" : "ファイルをドラッグ&ドロップ"}
-                          </p>
-                          <p className="text-gray-500 mb-3">または</p>
-                          <Button variant="outline" className="mb-3 bg-transparent text-sm">
-                            ファイルを選択
-                          </Button>
-                          <div className="text-xs text-gray-500 space-y-1">
-                            <p>対応形式: JPG, PNG | 最大: 7MB</p>
-                          </div>
+              <div className="order-2 lg:order-2 flex justify-center lg:justify-start lg:items-start">
+                <Card className="w-full max-w-md lg:max-w-none border-2 border-emerald-200 h-[380px] flex flex-col">
+                  <CardHeader className="pb-3 flex-shrink-0 pt-4">
+                    <CardTitle className="text-center text-lg">写真を選択してください</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 flex-1 flex flex-col">
+                    {!uploadedFile ? (
+                      <div
+                        {...getRootProps()}
+                        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors flex-1 flex flex-col items-center justify-center ${
+                          isDragActive ? "border-emerald-500 bg-emerald-50" : "border-gray-300 hover:border-emerald-400"
+                        }`}
+                      >
+                        <input {...getInputProps()} />
+                        <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                        <p className="text-base font-semibold text-gray-700 mb-2">
+                          {isDragActive ? "ここにファイルをドロップしてください" : "ファイルをドラッグ&ドロップ"}
+                        </p>
+                        <p className="text-gray-500 mb-3">または</p>
+                        <Button variant="outline" className="mb-3 bg-transparent text-sm">
+                          ファイルを選択
+                        </Button>
+                        <div className="text-xs text-gray-500 space-y-1">
+                          <p>対応形式: JPG, PNG | 最大: 7MB</p>
                         </div>
-                      ) : (
-                        <div className="space-y-3">
-                          <div className="text-center">
-                            {previewUrl && (
+                      </div>
+                    ) : (
+                      <div className="space-y-3 flex-1 flex flex-col">
+                        <div className="text-center flex-1 flex flex-col items-center justify-center">
+                          {previewUrl && (
+                            <div className="relative">
                               <Image
                                 src={previewUrl || "/placeholder.svg"}
                                 alt="アップロード写真"
-                                width={150}
-                                height={150}
+                                width={200}
+                                height={200}
                                 className="mx-auto rounded object-cover border-2 border-gray-200"
+                                style={{ aspectRatio: '1/1' }}
                               />
-                            )}
-                          </div>
-                          {isUploading && (
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-sm">
-                                <span>アップロード中...</span>
-                                <span>{uploadProgress}%</span>
-                              </div>
-                              <Progress value={uploadProgress} />
+                              {isUploading && (
+                                <div className="absolute inset-0 bg-black bg-opacity-30 rounded flex items-center justify-center">
+                                  <div className="text-white text-center">
+                                    <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+                                    <p className="text-sm">アップロード中...</p>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
-
-                {currentStep === "processing" && (
-                  <Card className="w-full max-w-md lg:max-w-none border-2 border-emerald-200 max-h-[350px] overflow-y-auto">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-center text-lg">AI処理中...</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4 space-y-4">
-                      <div className="text-center">
-                        <Loader2 className="w-12 h-12 text-emerald-600 animate-spin mx-auto mb-3" />
-                        <p className="text-gray-600 mb-3 text-sm">最新AI技術でマイナンバーカード規格に調整中</p>
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span>処理進行状況</span>
-                            <span>{processingProgress}%</span>
+                        {isUploading && (
+                          <div className="space-y-2 flex-shrink-0">
+                            <div className="flex justify-between text-sm">
+                              <span>アップロード中...</span>
+                              <span>{uploadProgress}%</span>
+                            </div>
+                            <Progress value={uploadProgress} />
                           </div>
-                          <Progress value={processingProgress} />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {currentStep === "payment" && (
-                  <Card className="w-full max-w-md lg:max-w-none border-2 border-emerald-200 max-h-[350px] overflow-y-auto">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-center text-emerald-600 text-lg">
-                        <CheckCircle className="w-5 h-5 inline mr-2" />
-                        処理完了！
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4">
-                      <div className="grid grid-cols-2 gap-3 mb-4">
-                        <div className="text-center">
-                          <h3 className="font-semibold mb-2 text-sm">元の写真</h3>
-                          {previewUrl && (
-                            <Image
-                              src={previewUrl || "/placeholder.svg"}
-                              alt="元の写真"
-                              width={120}
-                              height={120}
-                              className="mx-auto rounded object-cover border-2 border-gray-200"
-                            />
-                          )}
-                        </div>
-                        <div className="text-center">
-                          <h3 className="font-semibold mb-2 text-sm">処理後の写真</h3>
-                          <div className="relative">
-                            {processedUrl && (
-                              <>
-                                <Image
-                                  src={processedUrl || "/placeholder.svg"}
-                                  alt="処理後の写真"
-                                  width={120}
-                                  height={120}
-                                  className="mx-auto rounded object-cover border-2 border-emerald-200"
-                                />
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                  <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs font-semibold transform rotate-12">
-                                    SAMPLE
-                                  </div>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <Button
-                          onClick={() => setShowPaymentDialog(true)}
-                          size="sm"
-                          className="bg-emerald-600 hover:bg-emerald-700 text-sm"
-                        >
-                          <CreditCard className="w-4 h-4 mr-2" />
-                          ¥500で高画質版をダウンロード
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {currentStep === "download" && (
-                  <Card className="w-full max-w-md lg:max-w-none border-2 border-emerald-200 bg-emerald-50 max-h-[350px] overflow-y-auto">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-center text-emerald-600 text-lg">
-                        <CheckCircle className="w-5 h-5 inline mr-2" />
-                        ダウンロード準備完了！
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4 space-y-4">
-                      <div className="text-center">
-                        {processedUrl && (
-                          <Image
-                            src={processedUrl || "/placeholder.svg"}
-                            alt="完成した写真"
-                            width={200}
-                            height={200}
-                            className="mx-auto rounded object-cover border-2 border-emerald-200"
-                          />
                         )}
-                        <p className="text-xs text-gray-600 mt-3 mb-3">マイナンバーカード申請規格準拠・高画質JPEG写真</p>
-                        <div className="space-y-2">
-                          <Button onClick={handleDownload} size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-sm w-full">
-                            <Download className="w-4 h-4 mr-2" />
-                            高画質写真をダウンロード
-                          </Button>
-                          <Button onClick={resetProcess} variant="outline" size="sm" className="text-sm w-full">
-                            <RefreshCw className="w-4 h-4 mr-2" />
-                            新しい写真を処理
-                          </Button>
-                        </div>
+                        {!isUploading && uploadProgress === 100 && (
+                          <div className="text-center space-y-2 flex-shrink-0">
+                            <CheckCircle className="w-8 h-8 text-emerald-600 mx-auto" />
+                            <p className="text-sm text-emerald-600 font-medium">アップロード完了！</p>
+                            <p className="text-xs text-gray-500">AI処理の準備中...</p>
+                          </div>
+                        )}
+                        {error && (
+                          <div className="text-center space-y-2 flex-shrink-0">
+                            <p className="text-sm text-red-600 font-medium">{error}</p>
+                            <Button onClick={resetProcess} variant="outline" size="sm">
+                              再試行
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                    </CardContent>
-                  </Card>
-                )}
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
@@ -1551,72 +1466,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-
-      {/* Payment Dialog */}
-      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <CreditCard className="w-5 h-5 mr-2" />
-              お支払い
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6">
-            <div className="bg-emerald-50 p-4 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span>マイナンバーカード写真処理</span>
-                <span className="font-bold text-emerald-600">¥500</span>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="email">メールアドレス</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="example@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1"
-                />
-                <p className="text-sm text-gray-600 mt-2">
-                  処理完了後、こちらのメールアドレスにダウンロードリンクをお送りします
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start space-x-3">
-                <Shield className="w-5 h-5 text-blue-600 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-blue-800 mb-1">100%審査通過保証</h4>
-                  <p className="text-sm text-blue-700">審査に通らなかった場合は全額返金いたします</p>
-                </div>
-              </div>
-            </div>
-
-            <Button
-              onClick={handlePayment}
-              disabled={!email || isPaymentProcessing}
-              className="w-full bg-emerald-600 hover:bg-emerald-700"
-              size="lg"
-            >
-              {isPaymentProcessing ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  決済処理中...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="w-5 h-5 mr-2" />
-                  ¥500 を支払う
-                </>
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,6 +15,15 @@ export default function UploadPage() {
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const router = useRouter()
+
+  // Cleanup blob URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
 
   const simulateUpload = async (file: File) => {
     if (!file) return
@@ -46,18 +55,23 @@ export default function UploadPage() {
       console.log('upload response data:', data)
       console.log('data.success:', data.success)
       console.log('data.imageUrl:', data.imageUrl)
+      console.log('data.photoRecordId:', data.photoRecordId)
       
       if (data.success) {
         setUploadProgress(100)
-        // Store the uploaded image URL for processing
+
+        // Always prefer R2 URL for preview
         if (data.imageUrl) {
           console.log('存储 R2 imageUrl 到 sessionStorage:', data.imageUrl)
           sessionStorage.setItem("previewUrl", data.imageUrl)
         } else if (previewUrl) {
-          console.log('存储 blob previewUrl 到 sessionStorage:', previewUrl)
+          console.log('警告: R2 imageUrl 缺失，暂存本地 previewUrl')
           sessionStorage.setItem("previewUrl", previewUrl)
-        } else {
-          console.log('警告: 没有 imageUrl 也没有 previewUrl')
+        }
+
+        if (data.photoRecordId) {
+          console.log('存储 photoRecordId 到 sessionStorage:', data.photoRecordId)
+          sessionStorage.setItem("photoRecordId", data.photoRecordId)
         }
       } else {
         throw new Error(data.error || 'Upload failed')
@@ -92,6 +106,10 @@ export default function UploadPage() {
   })
 
   const removeFile = () => {
+    // Revoke blob URL to prevent memory leaks
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl)
+    }
     setUploadedFile(null)
     setPreviewUrl(null)
     setUploadProgress(0)
@@ -108,26 +126,48 @@ export default function UploadPage() {
           type: uploadedFile.type,
         }),
       )
-      if (previewUrl) {
+      
+      // Always use the R2 imageUrl if available, fallback to previewUrl only if needed
+      const r2ImageUrl = sessionStorage.getItem("previewUrl")
+      if (r2ImageUrl && r2ImageUrl.startsWith('http')) {
+        console.log('使用 R2 imageUrl 进行下一步处理:', r2ImageUrl)
+        sessionStorage.setItem("previewUrl", r2ImageUrl)
+      } else if (previewUrl) {
+        console.log('警告: 使用本地 previewUrl，可能无法被 Replicate API 处理:', previewUrl)
         sessionStorage.setItem("previewUrl", previewUrl)
+      } else {
+        console.log('错误: 没有可用的图片 URL')
+        alert('画像のURLが見つかりません。もう一度アップロードしてください。')
+        return
       }
-      router.push("/process")
+      
+      // 添加 from_upload 参数，标识是从上传页面跳转过来的
+      router.push("/process?from_upload=true")
     }
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
-              <Upload className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-gray-900">写真アップロード</h1>
-          </div>
-        </div>
-      </header>
+             {/* Header */}
+       <header className="bg-white border-b border-gray-200">
+         <div className="container mx-auto px-4 py-4">
+           <div className="flex items-center justify-between">
+             <div className="flex items-center space-x-2">
+               <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
+                 <Upload className="w-5 h-5 text-white" />
+               </div>
+               <h1 className="text-xl font-bold text-gray-900">写真アップロード</h1>
+             </div>
+             <Button
+               variant="outline"
+               onClick={() => window.location.href = '/'}
+               className="text-gray-600 hover:text-gray-900"
+             >
+               ホームに戻る
+             </Button>
+           </div>
+         </div>
+       </header>
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">

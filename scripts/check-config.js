@@ -1,84 +1,76 @@
 #!/usr/bin/env node
 
-console.log('🔍 检查当前环境变量配置')
-console.log('============================')
+const fs = require('fs');
+const path = require('path');
 
-// 尝试加载不同的.env文件
-const fs = require('fs')
-const path = require('path')
+console.log('🔍 Checking application configuration...\n');
 
-const possibleFiles = [
-  '.env.local',
-  '.env',
-  '.env.local.template'
-]
+// Check if .env.local exists
+const envPath = path.join(process.cwd(), '.env.local');
+const envExists = fs.existsSync(envPath);
 
-const currentDir = process.cwd()
-
-console.log('📁 当前工作目录:', currentDir)
-console.log('\n📄 检查文件存在情况:')
-
-possibleFiles.forEach(file => {
-  const filePath = path.join(currentDir, file)
-  const exists = fs.existsSync(filePath)
-  console.log(`   ${file}: ${exists ? '✅ 存在' : '❌ 不存在'}`)
-  
-  if (exists) {
-    const content = fs.readFileSync(filePath, 'utf8')
-    console.log(`   内容预览:`)
-    
-    // 只显示配置项，不显示实际值
-    const lines = content.split('\n')
-    lines.forEach(line => {
-      if (line.includes('R2_') || line.includes('REPLICATE_') || line.includes('POLAR_')) {
-        const [key, value] = line.split('=')
-        if (key && value) {
-          const isPlaceholder = value.includes('your_') || value.includes('placeholder')
-          const status = isPlaceholder ? '❌ 占位符' : '✅ 已配置'
-          console.log(`     ${key}=${status}`)
-        }
-      }
-    })
-    console.log('')
-  }
-})
-
-// 检查实际加载的环境变量
-console.log('🔍 实际加载的环境变量:')
-const envVars = [
-  'R2_ACCOUNT_ID',
-  'R2_ACCESS_KEY_ID', 
-  'R2_SECRET_ACCESS_KEY',
-  'R2_BUCKET_NAME',
-  'REPLICATE_API_TOKEN',
-  'POLAR_ACCESS_TOKEN'
-]
-
-let hasRealValues = false
-envVars.forEach(varName => {
-  const value = process.env[varName]
-  const isSet = value ? true : false
-  const isPlaceholder = value && (value.includes('your_') || value.includes('PLACEHOLDER') || value.includes('example'))
-  
-  console.log(`   ${varName}: ${isSet ? (isPlaceholder ? '❌ 占位符值' : '✅ 已配置') : '❌ 未设置'}`)
-  
-  if (isSet && !isPlaceholder) {
-    hasRealValues = true
-  }
-})
-
-console.log('\n📋 配置建议:')
-if (!hasRealValues) {
-  console.log('1. 运行: node scripts/setup-env.js')
-  console.log('2. 或手动编辑 .env.local')
-  console.log('3. 确保使用真实凭据，不是占位符')
-} else {
-  console.log('✅ 看起来已经配置了真实值')
+if (!envExists) {
+  console.log('❌ .env.local file not found!');
+  console.log('📝 Please run: npm run setup-env');
+  process.exit(1);
 }
 
-console.log('\n📌 文件位置确认:')
-console.log('   应该配置在:', path.join(currentDir, '.env.local'))
-console.log('   确保文件内容类似:')
-console.log('   R2_ACCOUNT_ID=1234567890abcdef1234567890abcdef')
-console.log('   R2_ACCESS_KEY_ID=1234567890abcdef1234567890abcdef')
-console.log('   R2_SECRET_ACCESS_KEY=1234567890abcdef1234567890abcdef1234567890abcdef')
+// Read and parse .env.local
+const envContent = fs.readFileSync(envPath, 'utf8');
+const envVars = {};
+
+envContent.split('\n').forEach(line => {
+  const [key, ...valueParts] = line.split('=');
+  if (key && !key.startsWith('#')) {
+    envVars[key.trim()] = valueParts.join('=').trim();
+  }
+});
+
+console.log('📋 Environment Variables Status:\n');
+
+const requiredVars = {
+  'NEXT_PUBLIC_SUPABASE_URL': 'Supabase project URL',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY': 'Supabase anonymous key',
+  'SUPABASE_SERVICE_ROLE_KEY': 'Supabase service role key (REQUIRED for payment updates)',
+  'STRIPE_SECRET_KEY': 'Stripe secret key',
+  'STRIPE_PRICE_ID': 'Stripe price ID',
+  'R2_ACCOUNT_ID': 'Cloudflare R2 account ID',
+  'R2_ACCESS_KEY_ID': 'Cloudflare R2 access key',
+  'R2_SECRET_ACCESS_KEY': 'Cloudflare R2 secret key',
+  'R2_BUCKET_NAME': 'Cloudflare R2 bucket name',
+  'REPLICATE_API_TOKEN': 'Replicate AI API token'
+};
+
+let hasIssues = false;
+
+Object.entries(requiredVars).forEach(([key, description]) => {
+  const value = envVars[key];
+  const status = value ? '✅' : '❌';
+  const displayValue = value ? (key.includes('KEY') || key.includes('TOKEN') ? '***SET***' : value) : 'MISSING';
+  
+  console.log(`${status} ${key}: ${displayValue}`);
+  console.log(`   ${description}`);
+  
+  if (!value) {
+    hasIssues = true;
+    if (key === 'SUPABASE_SERVICE_ROLE_KEY') {
+      console.log(`   ⚠️  This is the ROOT CAUSE of your 403 errors!`);
+      console.log(`   🔑 Get it from: Supabase Dashboard → Settings → API → service_role key`);
+    }
+  }
+  console.log('');
+});
+
+if (hasIssues) {
+  console.log('🚨 Configuration issues detected!');
+  console.log('\n🔧 To fix the 403 error:');
+  console.log('1. Go to your Supabase project dashboard');
+  console.log('2. Navigate to Settings → API');
+  console.log('3. Copy the "service_role" key (NOT the anon key)');
+  console.log('4. Add it to your .env.local file as: SUPABASE_SERVICE_ROLE_KEY=your_key_here');
+  console.log('5. Restart your development server');
+  process.exit(1);
+} else {
+  console.log('✅ All required environment variables are configured!');
+  console.log('🚀 Your application should work correctly now.');
+}

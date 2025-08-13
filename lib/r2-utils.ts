@@ -1,5 +1,6 @@
 import { PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
-import { r2Client, R2_BUCKET_NAME, R2_PATHS } from './r2-client'
+import { r2Client, R2_BUCKET_NAME, R2_PATHS, getR2FileUrl } from './r2-client'
+import { generateSecureFileId } from './utils'
 
 /**
  * 上传文件到R2
@@ -15,7 +16,7 @@ export async function uploadToR2(
       key,
       contentType,
       fileSize: file instanceof Buffer ? file.length : file.length,
-      endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+      endpoint: process.env.R2_ENDPOINT || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
     })
 
     const command = new PutObjectCommand({
@@ -28,14 +29,14 @@ export async function uploadToR2(
     const result = await r2Client.send(command)
     console.log('R2 upload success:', result)
     
-    // 返回文件URL
-    const fileUrl = `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET_NAME}/${key}`
+    // 使用新的URL生成函数
+    const fileUrl = getR2FileUrl(key)
     console.log('Generated file URL:', fileUrl)
     return fileUrl
   } catch (error) {
     console.error('R2 upload error:', error)
     console.error('R2 client config:', {
-      endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      endpoint: process.env.R2_ENDPOINT || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
       bucket: R2_BUCKET_NAME,
       hasCredentials: !!(process.env.R2_ACCESS_KEY_ID && process.env.R2_SECRET_ACCESS_KEY)
     })
@@ -76,6 +77,6 @@ export async function downloadAndUploadToR2(
  */
 export function generateFileKey(prefix: string, filename: string): string {
   const timestamp = Date.now()
-  const randomId = Math.random().toString(36).substring(2, 15)
-  return `${prefix}${timestamp}-${randomId}-${filename}`
+  const secureId = generateSecureFileId()
+  return `${prefix}${timestamp}-${secureId}-${filename}`
 } 
