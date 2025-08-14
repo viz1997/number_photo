@@ -8,7 +8,6 @@
     "lint": "next lint",
     "start": "next start",
     "check-config": "node scripts/check-config.js",
-    "check-r2": "node scripts/check-r2-config.js",
     "setup-env": "node scripts/setup-env.js",
     "test-supabase": "node test-supabase-connection.js",
     "db:push": "supabase db push",
