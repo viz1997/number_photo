@@ -222,15 +222,30 @@ export default function HomePage() {
 
             {/* 左右结构的内容区域 */}
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* 左侧：处理前图片 */}
+              {/* 左侧：Before/After对比图片 */}
               <div className="order-2 lg:order-1">
-                <Image
-                  src="/my-number-card-photo-before1.webp"
-                  alt="処理前の写真"
-                  width={400}
-                  height={400}
-                  className="rounded-lg object-cover"
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <h3 className="font-semibold mb-3 text-red-600">Before</h3>
+                    <Image
+                      src="/my-number-card-photo-before1.webp"
+                      alt="処理前の写真"
+                      width={200}
+                      height={200}
+                      className="rounded-lg object-cover border-2 border-red-200"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-semibold mb-3 text-emerald-600">After</h3>
+                    <Image
+                      src="/my-number-card-photo-after1.webp"
+                      alt="処理後の写真"
+                      width={200}
+                      height={200}
+                      className="rounded-lg object-cover border-2 border-emerald-200"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* 右侧：上传功能 */}
