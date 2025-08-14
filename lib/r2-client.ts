@@ -11,12 +11,12 @@ export const r2Client = new S3Client({
 })
 
 // R2存储桶名称
-export const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || 'numberphoto'
+export const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || 'test'
 
 // 文件路径配置
 export const R2_PATHS = {
-  INPUT: 'numberphoto/input-ugc/',
-  OUTPUT: 'numberphoto/output-ugc/',
+  INPUT: 'mynumber/input/',
+  OUTPUT: 'mynumber/output/',
 } as const
 
 // 生成R2文件URL - 使用公共域名

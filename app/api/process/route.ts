@@ -49,66 +49,15 @@ export async function POST(request: NextRequest) {
 
     console.log('Starting AI processing for photo:', photoRecord.input_image_url)
 
-    // Parse R2 object key - 修复路径解析逻辑
-    let inputKey: string
-    try {
-      const inputUrl = new URL(photoRecord.input_image_url)
-      
-      // 处理不同的URL格式
-      if (inputUrl.hostname.includes('r2.cloudflarestorage.com')) {
-        // 直接R2 URL格式: https://account.r2.cloudflarestorage.com/bucket/key
-        const pathParts = inputUrl.pathname.split('/')
-        if (pathParts.length >= 3) {
-          inputKey = pathParts.slice(2).join('/') // 跳过空字符串和bucket名
-        } else {
-          throw new Error('Invalid R2 URL format')
-        }
-      } else if (process.env.NEXT_PUBLIC_R2_PUBLIC_BUCKET_DOMAIN && 
-                 inputUrl.hostname === new URL(process.env.NEXT_PUBLIC_R2_PUBLIC_BUCKET_DOMAIN).hostname) {
-        // 公共域名URL格式: https://public-domain.com/key
-        inputKey = inputUrl.pathname.replace(/^\/+/, "")
-      } else {
-        // 其他格式，尝试直接使用pathname
-        inputKey = inputUrl.pathname.replace(/^\/+/, "")
-      }
-      
-      console.log('Parsed input key:', inputKey)
-      
-      if (!inputKey.startsWith(R2_PATHS.INPUT)) {
-        console.warn("Input key does not start with expected prefix:", {
-          inputKey,
-          expectedPrefix: R2_PATHS.INPUT,
-        })
-      }
-    } catch (urlError) {
-      console.error('Failed to parse input URL:', photoRecord.input_image_url, urlError)
-      return NextResponse.json({ 
-        error: "Invalid input image URL",
-        details: "Could not parse the input image URL"
-      }, { status: 400 })
-    }
+    // Parse R2 object key
+    const inputUrl = new URL(photoRecord.input_image_url)
+    const inputKey = inputUrl.pathname.replace(/^\/+/, "")
 
-    // 验证输入文件是否存在
-    try {
-      const { HeadObjectCommand } = await import('@aws-sdk/client-s3')
-      await r2Client.send(new HeadObjectCommand({
-        Bucket: R2_BUCKET_NAME,
-        Key: inputKey
-      }))
-      console.log('Input file exists in R2:', inputKey)
-    } catch (headError: any) {
-      if (headError.name === 'NotFound' || headError.$metadata?.httpStatusCode === 404) {
-        console.error('Input file not found in R2:', inputKey)
-        return NextResponse.json({ 
-          error: "Input file not found",
-          details: `The input image file does not exist in R2 storage: ${inputKey}`
-        }, { status: 404 })
-      }
-      console.error('Error checking input file existence:', headError)
-      return NextResponse.json({ 
-        error: "Failed to verify input file",
-        details: "Could not verify if the input image exists"
-      }, { status: 500 })
+    if (!inputKey.startsWith(R2_PATHS.INPUT)) {
+      console.warn("Input key does not start with expected prefix:", {
+        inputKey,
+        expectedPrefix: R2_PATHS.INPUT,
+      })
     }
 
     // Generate secure random output filename instead of predictable path replacement
@@ -161,7 +110,6 @@ export async function POST(request: NextRequest) {
     if (!outputImageUrl) {
       console.log('Using fallback processing: copying input to output')
       try {
-        const { CopyObjectCommand } = await import('@aws-sdk/client-s3')
         await r2Client.send(new CopyObjectCommand({
           Bucket: R2_BUCKET_NAME,
           CopySource: `${R2_BUCKET_NAME}/${inputKey}`,
@@ -173,23 +121,15 @@ export async function POST(request: NextRequest) {
         console.log('Fallback processing completed, output URL:', outputImageUrl)
       } catch (copyError) {
         console.error('Fallback processing failed:', copyError)
-        throw new Error(`Failed to process image with both AI and fallback methods: ${copyError instanceof Error ? copyError.message : 'Unknown error'}`)
+        throw new Error('Failed to process image with both AI and fallback methods')
       }
     }
 
     // Update database record with output image URL
     console.log('Updating database record with output image URL:', outputImageUrl)
-    const updateSuccess = await updatePhotoRecord(photoRecordId, {
+    await updatePhotoRecord(photoRecordId, {
       output_image_url: outputImageUrl,
     })
-
-    if (!updateSuccess) {
-      console.error('Failed to update database record')
-      return NextResponse.json({ 
-        error: "Failed to update database",
-        details: "Could not save the processing result to database"
-      }, { status: 500 })
-    }
 
     console.log('=== Process API Completed Successfully ===')
     console.log('Output image URL:', outputImageUrl)
