@@ -1013,22 +1013,28 @@ export default function ProcessPage() {
        <header className="bg-white border-b border-gray-200">
          <div className="container mx-auto px-4 py-4">
            <div className="flex items-center justify-between">
-             <div className="flex items-center space-x-2">
-               <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
-                 <Loader2 className="w-5 h-5 text-white" />
+             <div className="flex items-center space-x-4">
+               <div className="flex items-center space-x-2 cursor-pointer" onClick={() => window.location.href = '/'}>
+                 <Image
+                   src="/favicon-32x32.png"
+                   alt="Logo"
+                   width={32}
+                   height={32}
+                   className="rounded"
+                 />
+                 <h1 className="text-xl font-bold text-gray-900">マイナンバーカード写真</h1>
                </div>
-               <h1 className="text-xl font-bold text-gray-900">写真処理中</h1>
+               <Button
+                 variant="outline"
+                 onClick={() => window.location.href = '/'}
+                 className="text-gray-600 hover:text-gray-900"
+               >
+                 ホーム
+               </Button>
              </div>
-                                                       <div className="flex items-center space-x-2">
-                     
-              <Button
-                variant="outline"
-                onClick={() => window.location.href = '/'}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                ホーム
-              </Button>
-               </div>
+             <div className="flex items-center space-x-2">
+               {/* 右侧可以放置其他元素，目前为空 */}
+             </div>
            </div>
          </div>
        </header>
