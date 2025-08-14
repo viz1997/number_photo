@@ -10,8 +10,10 @@ export function cn(...inputs: ClassValue[]) {
  * 使用crypto.randomUUID()生成UUID，然后转换为base64格式，确保文件名安全且不可预测
  */
 export function generateSecureFileName(extension: string = 'jpg'): string {
-  // 使用crypto.randomUUID()生成UUID
-  const uuid = crypto.randomUUID()
+  // 使用crypto.randomUUID()生成UUID，兼容服务器端
+  const uuid = typeof crypto !== 'undefined' && crypto.randomUUID ? 
+    crypto.randomUUID() : 
+    require('crypto').randomUUID()
   
   // 将UUID转换为base64格式，移除特殊字符，只保留字母数字
   const base64 = Buffer.from(uuid.replace(/-/g, ''), 'hex').toString('base64')
@@ -31,7 +33,11 @@ export function generateSecureFileName(extension: string = 'jpg'): string {
  * 用于数据库记录和内部引用
  */
 export function generateSecureFileId(): string {
-  const uuid = crypto.randomUUID()
+  // 使用crypto.randomUUID()生成UUID，兼容服务器端
+  const uuid = typeof crypto !== 'undefined' && crypto.randomUUID ? 
+    crypto.randomUUID() : 
+    require('crypto').randomUUID()
+  
   const base64 = Buffer.from(uuid.replace(/-/g, ''), 'hex').toString('base64')
   const cleanBase64 = base64.replace(/[^a-zA-Z0-9]/g, '')
   
