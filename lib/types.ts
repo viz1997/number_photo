@@ -48,8 +48,8 @@ export interface DownloadToken {
 }
 
 export interface MyNumberPhotoSpecs {
-  width: number // 4.5cm at 300dpi = 531px
-  height: number // 3.5cm at 300dpi = 413px
+  width: number // 35mm at 300dpi = 413px
+  height: number // 45mm at 300dpi = 531px
   dpi: number
   format: "jpeg"
   backgroundColor: "#ffffff"
@@ -57,8 +57,8 @@ export interface MyNumberPhotoSpecs {
 }
 
 export const MYNUMBER_PHOTO_SPECS: MyNumberPhotoSpecs = {
-  width: 531,
-  height: 413,
+  width: 413, // 35mm at 300dpi
+  height: 531, // 45mm at 300dpi
   dpi: 300,
   format: "jpeg",
   backgroundColor: "#ffffff",

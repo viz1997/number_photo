@@ -157,7 +157,7 @@ export default function DownloadPage({ params }: { params: { token: string } }) 
                   <h4 className="font-semibold text-blue-800 mb-2">写真の仕様</h4>
                   <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-700">
                     <div>
-                      <p>• サイズ: 4.5cm × 3.5cm</p>
+                      <p>• サイズ: 3.5cm × 4.5cm</p>
                       <p>• 解像度: 300dpi</p>
                     </div>
                     <div>
