@@ -19,7 +19,7 @@ export async function GET(
 
     // For demo purposes, we'll return a mock download URL for watermarked version
     const mockDownloadUrl = `https://example.com/watermarked/${token}`
-    const fileName = `watermarked-photo-${Date.now()}.jpg`
+    const fileName = `my-number-photo-preview-${Date.now()}.jpg`
 
     return NextResponse.json({
       success: true,

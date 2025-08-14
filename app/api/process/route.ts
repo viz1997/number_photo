@@ -79,10 +79,10 @@ export async function POST(request: NextRequest) {
           'black-forest-labs/flux-kontext-pro:aa776ca45ce7f7d185418f700df8ec6ca6cb367bfd88e9cd225666c4c179d1d7',
           {
             input: {
-              prompt: 'Transform this photo into official Japanese My Number Card format: clean solid white background, crop and reframe to show head and upper shoulders only, center the face vertically in frame with head taking up 70-75% of total height, ensure 4±2mm margin from top of head to frame edge, position face exactly in horizontal center, maintain 34±2mm from chin to top of head measurement, professional passport-style lighting with no shadows on face or background, front-facing pose, neutral expression with mouth closed, eyes looking directly at camera with clear gaze, hair should not cover face or ears, remove any accessories like hats or sunglasses, sharp focus on facial features, government ID photo standards compliance, official document quality, output image must be exactly 4.5cm × 3.5cm (45mm × 35mm) passport photo size, high resolution 300dpi',
+              prompt: 'Transform this photo into official Japanese My Number Card format: clean solid white background, crop and reframe to show head and upper shoulders only, center the face vertically in frame with head taking up 70-75% of total height, ensure 4±2mm margin from top of head to frame edge, position face exactly in horizontal center, maintain 34±2mm from chin to top of head measurement, professional passport-style lighting with no shadows on face or background, front-facing pose, neutral expression with mouth closed, eyes looking directly at camera with clear gaze, hair should not cover face or ears, remove any accessories like hats or sunglasses, sharp focus on facial features, government ID photo standards compliance, official document quality, output image must be exactly 4.5cm × 3.5cm (45mm × 35mm) passport photo size, high resolution 300dpi, JPEG format',
               input_image: photoRecord.input_image_url,
               aspect_ratio: '4:5', // Fixed: Valid aspect ratio for Replicate API
-              output_format: 'jpg',
+              output_format: 'jpg', // Ensure JPEG output format
               safety_tolerance: 2,
             },
           }
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
           CopySource: `${R2_BUCKET_NAME}/${inputKey}`,
           Key: outputKey,
           MetadataDirective: 'REPLACE',
-          ContentType: 'image/jpeg',
+          ContentType: 'image/jpeg', // Ensure JPEG format
         }))
         outputImageUrl = getR2PublicUrl(outputKey)
         console.log('Fallback processing completed, output URL:', outputImageUrl)

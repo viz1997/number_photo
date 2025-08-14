@@ -226,6 +226,12 @@ export default function ProcessPage() {
           }
           const photoRecordId = sessionStorage.getItem("photoRecordId")
           if (fileKey && photoRecordId) {
+            // 如果已经有下载token，不需要再处理
+            if (downloadToken) {
+              console.log('已有下载token，跳过支付返回处理')
+              return
+            }
+            
             // 立即设置支付完成标志，给用户即时反馈
             sessionStorage.setItem("paymentCompleted", "true")
             
@@ -236,7 +242,7 @@ export default function ProcessPage() {
          
             setTimeout(() => {
          
-              // 如果还在创建下载token，保持加载状态
+              // 如果还没有下载token，保持加载状态
               if (!downloadToken) {
                 setIsCreatingDownloadToken(true)
               }
@@ -359,6 +365,12 @@ export default function ProcessPage() {
         const photoRecordId = sessionStorage.getItem('photoRecordId') || undefined
         if (!fileKey || !photoRecordId) return
         
+        // 如果已经有下载token，不需要再处理
+        if (downloadToken) {
+          console.log('已有下载token，跳过处理')
+          return
+        }
+        
         // 立即设置支付完成状态
         sessionStorage.setItem('paymentCompleted', 'true')
         setShowCheckout(false)
@@ -368,7 +380,7 @@ export default function ProcessPage() {
  
         setTimeout(() => {
         
-          // 如果还在创建下载token，保持加载状态
+          // 如果还没有下载token，保持加载状态
           if (!downloadToken) {
             setIsCreatingDownloadToken(true)
           }
@@ -761,7 +773,7 @@ export default function ProcessPage() {
       
       ctx.restore()
       
-      // Convert to data URL
+      // Convert to data URL with JPEG format
       const watermarkedDataUrl = canvas.toDataURL('image/jpeg', 0.9)
       setWatermarkedImageUrl(watermarkedDataUrl)
     }
@@ -917,7 +929,7 @@ export default function ProcessPage() {
         if (wmRes.ok && wmData.downloadUrl) {
           const link = document.createElement('a')
           link.href = wmData.downloadUrl
-          link.download = wmData.fileName || `watermarked-photo-${Date.now()}.jpg`
+          link.download = wmData.fileName || `my-number-photo-preview-${Date.now()}.jpg`
           document.body.appendChild(link)
           link.click()
           document.body.removeChild(link)
@@ -1150,7 +1162,7 @@ export default function ProcessPage() {
                                            // 创建下载链接
                                            const link = document.createElement('a')
                                            link.href = blobUrl
-                                           link.download = `processed-photo-${Date.now()}.jpg`
+                                            link.download = `my-number-photo-${Date.now()}.jpeg`
                                            document.body.appendChild(link)
                                            link.click()
                                            document.body.removeChild(link)
@@ -1165,7 +1177,7 @@ export default function ProcessPage() {
                                            // 如果fetch下载失败，回退到直接链接下载
                                            const link = document.createElement('a')
                                            link.href = processedImageUrl
-                                           link.download = `processed-photo-${Date.now()}.jpg`
+                                            link.download = `my-number-photo-${Date.now()}.jpeg`
                                            link.target = '_blank'
                                            link.rel = 'noopener noreferrer'
                                            document.body.appendChild(link)
@@ -1205,7 +1217,7 @@ export default function ProcessPage() {
                                            // 创建下载链接
                                            const link = document.createElement('a')
                                            link.href = blobUrl
-                                           link.download = data.fileName || `processed-photo-${Date.now()}.jpg`
+                                            link.download = (data.fileName ? data.fileName.replace(/\.(jpg|jpeg|png|webp)$/i, '.jpeg') : `my-number-photo-${Date.now()}.jpeg`)
                                            document.body.appendChild(link)
                                            link.click()
                                            document.body.removeChild(link)
@@ -1219,7 +1231,7 @@ export default function ProcessPage() {
                                            // 如果fetch下载失败，回退到直接链接下载
                                            const link = document.createElement('a')
                                            link.href = data.downloadUrl
-                                           link.download = data.fileName || `processed-photo-${Date.now()}.jpg`
+                                            link.download = (data.fileName ? data.fileName.replace(/\.(jpg|jpeg|png|webp)$/i, '.jpeg') : `my-number-photo-${Date.now()}.jpeg`)
                                            link.target = '_blank'
                                            link.rel = 'noopener noreferrer'
                                            document.body.appendChild(link)

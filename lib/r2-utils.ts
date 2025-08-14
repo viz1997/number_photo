@@ -60,7 +60,7 @@ export async function downloadAndUploadToR2(
     
     const imageBuffer = await response.arrayBuffer()
     
-    // 上传到R2
+    // 上传到R2，确保JPEG格式
     return await uploadToR2(
       Buffer.from(imageBuffer),
       key,
