@@ -224,24 +224,24 @@ export default function HomePage() {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               {/* 左侧：Before/After对比图片 */}
               <div className="order-2 lg:order-1">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <div className="text-center">
-                    <h3 className="font-semibold mb-3 text-red-600">Before</h3>
+                    <h3 className="font-semibold mb-4 text-red-600">任意の写真</h3>
                     <Image
-                      src="/my-number-card-photo-before1.webp"
-                      alt="処理前の写真"
-                      width={200}
-                      height={200}
+                      src="/my-number-card-photo-sample.webp"
+                      alt="マイナンバーカード写真処理前の写真"
+                      width={350}
+                      height={350}
                       className="rounded-lg object-cover border-2 border-red-200"
                     />
                   </div>
                   <div className="text-center">
-                    <h3 className="font-semibold mb-3 text-emerald-600">After</h3>
+                    <h3 className="font-semibold mb-4 text-emerald-600">基準に適合した写真</h3>
                     <Image
-                      src="/my-number-card-photo-after1.webp"
-                      alt="処理後の写真"
-                      width={200}
-                      height={200}
+                      src="/my-number-card-photo-sample2.webp"
+                      alt="マイナンバーカード写真処理後の写真"
+                      width={350}
+                      height={350}
                       className="rounded-lg object-cover border-2 border-emerald-200"
                     />
                   </div>
@@ -253,7 +253,7 @@ export default function HomePage() {
                 {currentStep === "upload" && (
                   <Card className="border-2 border-emerald-200">
                     <CardHeader>
-                      <CardTitle className="text-center">写真を選択してください</CardTitle>
+                      <CardTitle className="text-center">写真をアップロードしてください</CardTitle>
                     </CardHeader>
                     <CardContent>
                       {!uploadedFile ? (

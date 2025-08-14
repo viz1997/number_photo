@@ -58,10 +58,14 @@ export default function DownloadPage({ params }: { params: { token: string } }) 
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
-                <Download className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-gray-900">ダウンロード</h1>
+              <Image
+                src="/favicon-32x32.png"
+                alt="Logo"
+                width={32}
+                height={32}
+                className="rounded"
+              />
+              <h1 className="text-xl font-bold text-gray-900">マイナンバーカード写真</h1>
             </div>
             <Button
               variant="outline"
