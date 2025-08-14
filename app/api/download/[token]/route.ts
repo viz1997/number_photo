@@ -47,7 +47,7 @@ export async function GET(
     const downloadUrl = getR2PublicUrl(fileKey)
     
     // 生成文件名
-    const fileName = `processed-photo-${Date.now()}.jpg`
+    const fileName = `my-number-photo-${Date.now()}.jpg`
 
     // 返回下载信息
     return NextResponse.json({
