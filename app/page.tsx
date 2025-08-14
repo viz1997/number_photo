@@ -17,6 +17,7 @@ import {
   Zap,
   ExternalLink,
   Loader2,
+  CreditCard,
 } from "lucide-react"
 import { useDropzone } from "react-dropzone"
 import Image from "next/image"
@@ -30,6 +31,10 @@ export default function HomePage() {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [currentStep, setCurrentStep] = useState<"upload" | "processing" | "payment" | "download">("upload")
+  const [processingProgress, setProcessingProgress] = useState(0)
+  const [processedUrl, setProcessedUrl] = useState<string | null>(null)
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false)
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
@@ -124,6 +129,20 @@ export default function HomePage() {
     }
   }
 
+  // 处理下载功能
+  const handleDownload = () => {
+    if (processedUrl) {
+      const link = document.createElement('a')
+      link.href = processedUrl
+      link.download = 'my-number-card-photo.jpg'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+
+
+
   const removeFile = () => {
     if (previewUrl && previewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(previewUrl)
@@ -136,6 +155,10 @@ export default function HomePage() {
 
   const resetProcess = () => {
     removeFile()
+    setProcessedUrl(null)
+    setCurrentStep("upload")
+    setProcessingProgress(0)
+    setShowPaymentDialog(false)
   }
 
   return (

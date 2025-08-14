@@ -8,7 +8,12 @@
     "lint": "next lint",
     "start": "next start",
     "check-config": "node scripts/check-config.js",
-    "setup-env": "node scripts/setup-env.js"
+    "check-r2": "node scripts/check-r2-config.js",
+    "setup-env": "node scripts/setup-env.js",
+    "test-supabase": "node test-supabase-connection.js",
+    "db:push": "supabase db push",
+    "db:status": "supabase status",
+    "db:reset": "supabase db reset"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.855.0",
