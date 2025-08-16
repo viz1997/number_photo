@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
-import { Loader2, ArrowRight, CheckCircle, Download, Upload, X, AlertCircle, Mail, Clock, Star } from "lucide-react"
+import { Loader2, ArrowRight, CheckCircle, Download, Upload, X, AlertCircle, Mail, Clock, Star, ExternalLink } from "lucide-react"
 import Image from "next/image"
 import { loadStripe } from "@stripe/stripe-js"
 import { CheckoutProvider } from "@stripe/react-stripe-js"
@@ -17,7 +17,7 @@ import { getAccessibleR2FileUrl } from "@/lib/r2-client"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "")
 
-export default function ProcessPage() {
+function ProcessPageContent() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
   const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null)
@@ -1267,22 +1267,28 @@ export default function ProcessPage() {
        <header className="bg-white border-b border-gray-200">
          <div className="container mx-auto px-4 py-4">
            <div className="flex items-center justify-between">
-             <div className="flex items-center space-x-2">
-               <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
-                 <Loader2 className="w-5 h-5 text-white" />
+             <div className="flex items-center space-x-4">
+               <div className="flex items-center space-x-2 cursor-pointer" onClick={() => window.location.href = '/'}>
+                 <Image
+                   src="/favicon-32x32.png"
+                   alt="Logo"
+                   width={32}
+                   height={32}
+                   className="rounded"
+                 />
+                 <h1 className="text-xl font-bold text-gray-900">マイナンバーカード写真</h1>
                </div>
-               <h1 className="text-xl font-bold text-gray-900">写真処理中</h1>
+               <Button
+                 variant="outline"
+                 onClick={() => window.location.href = '/'}
+                 className="text-gray-600 hover:text-gray-900"
+               >
+                 ホーム
+               </Button>
              </div>
-                                                       <div className="flex items-center space-x-2">
-                     
-              <Button
-                variant="outline"
-                onClick={() => window.location.href = '/'}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                ホーム
-              </Button>
-               </div>
+             <div className="flex items-center space-x-2">
+               {/* 右侧可以放置其他元素，目前为空 */}
+             </div>
            </div>
          </div>
        </header>
@@ -1301,7 +1307,7 @@ export default function ProcessPage() {
                 }`}>
                   {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : processedImageUrl ? <CheckCircle className="w-4 h-4" /> : '1'}
                 </div>
-                <span className={`ml-2 font-semibold ${processedImageUrl ? 'text-emerald-600' : isProcessing ? 'text-emerald-600' : 'text-gray-500'}`}>処理・支払い</span>
+                <span className={`ml-2 font-semibold ${processedImageUrl ? 'text-emerald-600' : isProcessing ? 'text-emerald-600' : 'text-gray-500'}`}>AI処理</span>
               </div>
 
               <div className={`w-8 h-px ${downloadToken ? 'bg-emerald-600' : 'bg-gray-300'}`}></div>
@@ -1313,7 +1319,7 @@ export default function ProcessPage() {
                 }`}>
                   {downloadToken ? <CheckCircle className="w-4 h-4" /> : '2'}
                 </div>
-                <span className={`ml-2 font-semibold ${downloadToken ? 'text-emerald-600' : 'text-gray-500'}`}>ダウンロード</span>
+                <span className={`ml-2 font-semibold ${downloadToken ? 'text-emerald-600' : 'text-gray-500'}`}>支払い・ダウンロード</span>
               </div>
             </div>
           </div>
@@ -1330,7 +1336,7 @@ export default function ProcessPage() {
                   <p className="text-gray-600 mb-4">マイナンバーカード規格に合わせて写真を調整中です</p>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>処理進行状況</span>
+                      <span>処理中...</span>
                       <span>{progress}%</span>
                     </div>
                     <Progress value={progress} className="w-full" />
@@ -1378,7 +1384,7 @@ export default function ProcessPage() {
                                     className="rounded object-cover"
                                   />
                                 </div>
-                    <p className="text-sm text-gray-600 mb-4">マイナンバーカード申請規格準拠・高画質JPEG（ウォーターマークなし）</p>
+                    <p className="text-sm text-gray-600 mb-4">マイナンバーカード申請規格準拠・4:5比例・高画質JPEG（ウォーターマークなし）</p>
 
                     <Button
                       onClick={async () => {
@@ -1573,7 +1579,7 @@ export default function ProcessPage() {
                                     className="rounded object-cover"
                                   />
                                 </div>
-                               <p className="text-sm text-gray-600 mb-4">マイナンバーカード申請規格準拠・高画質JPEG（ウォーターマークなし）</p>
+                               <p className="text-sm text-gray-600 mb-4">マイナンバーカード申請規格準拠・4:5比例・高画質JPEG（ウォーターマークなし）</p>
 
                                                                <Button
                                                                      onClick={async () => {
@@ -1630,7 +1636,7 @@ export default function ProcessPage() {
                                <h4 className="font-semibold text-blue-800 mb-2">写真の仕様</h4>
                                <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-700">
                                  <div>
-                                   <p>• サイズ: 4.5cm × 3.5cm</p>
+                                   <p>• サイズ: 3.5cm × 4.5cm</p>
                                    <p>• 解像度: 300dpi</p>
                                  </div>
                                  <div>
@@ -1718,7 +1724,8 @@ export default function ProcessPage() {
                     {/* Original Image */}
                     <div className="text-center">
                       <h3 className="font-semibold mb-4">元の写真</h3>
-                      <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
+
+                      <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50 h-80 flex flex-col justify-center">
                         {originalImageUrl ? (
                           <Image
                             src={originalImageUrl}
@@ -1743,7 +1750,7 @@ export default function ProcessPage() {
                     {/* Processed Image */}
                     <div className="text-center">
                       <h3 className="font-semibold mb-4">処理後の写真</h3>
-                      <div className="border-2 border-emerald-200 rounded-lg p-4 bg-emerald-50 relative">
+                      <div className="border-2 border-emerald-200 rounded-lg p-4 bg-emerald-50 relative h-80 flex flex-col justify-center">
                         {watermarkedImageUrl && (
                           <Image
                             src={watermarkedImageUrl}
@@ -1763,7 +1770,7 @@ export default function ProcessPage() {
                     <div className="grid md:grid-cols-2 gap-4 text-sm text-emerald-700">
                       <div>
                         <p>• 背景: 無地白色に調整</p>
-                        <p>• サイズ: 4.5cm × 3.5cm (規格準拠)</p>
+                        <p>• サイズ: 3.5cm × 4.5cm (規格準拠)</p>
                       </div>
                       <div>
                         <p>• 解像度: 300dpi (高画質)</p>
@@ -1771,8 +1778,153 @@ export default function ProcessPage() {
                       </div>
                     </div>
                   </div>
+                  {/* オンライン申請方法 */}
+                  <div className="mt-6 bg-white border border-gray-200 rounded-lg p-6">
+                    <h4 className="font-semibold text-gray-900 mb-4 text-center">マイナンバーカード オンライン申請方法</h4>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                      {/* Step 1 */}
+                      <div className="text-center">
+                        <div className="mb-3">
+                          <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-2 border-emerald-200">
+                            <div className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center">
+                              <span className="text-white font-bold text-xs">1</span>
+                            </div>
+                          </div>
+                        </div>
+                        <h5 className="font-semibold text-sm mb-2 text-gray-900">メールアドレス登録</h5>
+                        <div className="bg-gray-50 border border-gray-200 rounded p-2">
+                          <div className="flex items-center justify-center mb-2">
+                            <span className="text-xl">📧</span>
+                          </div>
+                          <p className="text-xs text-gray-600 mb-1">オンライン申請サイトにアクセス</p>
+                          <div className="text-xs text-gray-500 space-y-1">
+                            <p>• 申請書ID（23桁）</p>
+                            <p>• メール連絡用氏名</p>
+                            <p>• メールアドレス</p>
+                          </div>
+                        </div>
+                      </div>
 
+                      {/* Step 2 */}
+                      <div className="text-center">
+                        <div className="mb-3">
+                          <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-2 border-emerald-200">
+                            <div className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center">
+                              <span className="text-white font-bold text-xs">2</span>
+                            </div>
+                          </div>
+                        </div>
+                        <h5 className="font-semibold text-sm mb-2 text-gray-900">顔写真登録</h5>
+                        <div className="bg-gray-50 border border-gray-200 rounded p-2">
+                          <div className="flex items-center justify-center mb-2">
+                            <span className="text-xl">📷</span>
+                          </div>
+                          <p className="text-xs text-gray-600 mb-1">申請者専用WEBサイトで写真登録</p>
+                          <div className="text-xs text-gray-500 space-y-1">
+                            <p>• 顔写真登録</p>
+                            <p>• 顔写真登録確認</p>
+                            <p>• スマホ撮影も可能</p>
+                          </div>
+                        </div>
+                      </div>
 
+                      {/* Step 3 */}
+                      <div className="text-center">
+                        <div className="mb-3">
+                          <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-2 border-emerald-200">
+                            <div className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center">
+                              <span className="text-white font-bold text-xs">3</span>
+                            </div>
+                          </div>
+                        </div>
+                        <h5 className="font-semibold text-sm mb-2 text-gray-900">申請情報登録</h5>
+                        <div className="bg-gray-50 border border-gray-200 rounded p-2">
+                          <div className="flex items-center justify-center mb-2">
+                            <span className="text-xl">📝</span>
+                          </div>
+                          <p className="text-xs text-gray-600 mb-1">その他申請に必要な情報を入力</p>
+                          <div className="text-xs text-gray-500 space-y-1">
+                            <p>• 生年月日（必須）</p>
+                            <p>• 電子証明書発行希望</p>
+                            <p>• 氏名の点字表記希望</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Step 4 */}
+                      <div className="text-center">
+                        <div className="mb-3">
+                          <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-2 border-emerald-200">
+                            <div className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center">
+                              <span className="text-white font-bold text-xs">4</span>
+                            </div>
+                          </div>
+                        </div>
+                        <h5 className="font-semibold text-sm mb-2 text-gray-900">申請完了</h5>
+                        <div className="bg-gray-50 border border-gray-200 rounded p-2">
+                          <div className="flex items-center justify-center mb-2">
+                            <span className="text-xl">✅</span>
+                          </div>
+                          <p className="text-xs text-gray-600 mb-1">必要事項を入力して送信</p>
+                          <div className="text-xs text-gray-500 space-y-1">
+                            <p>• 申請完了メール受信</p>
+                            <p>• 申請状況確認可能</p>
+                            <p>• 交付準備完了</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* オンライン申請リンク */}
+                    <div className="text-center">
+                      <a 
+                        href="https://net.kojinbango-card.go.jp/SS_SERVICE_OUT/FA01S001Action.do" 
+                        target="_blank" 
+                        rel="nofollow noopener noreferrer"
+                        className="inline-flex items-center text-emerald-600 hover:text-emerald-700 underline text-sm"
+                      >
+                        <ExternalLink className="w-3 h-3 mr-1" />
+                        オンライン申請サイトへ
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* 価格表示 */}
+                  <div className="mt-6 bg-white border border-gray-200 rounded-lg p-6 text-center">
+                    <div className="flex items-center justify-center space-x-4 mb-2">
+                      <span className="text-gray-600 text-lg">今だけ</span>
+                      <span className="text-3xl font-bold text-emerald-600">799円</span>
+                      <span className="text-xl text-red-500 line-through">1499円</span>
+                    </div>
+                    <p className="text-sm text-gray-500">高画質・規格準拠のマイナンバーカード写真</p>
+                  </div>
+
+                  {/* Embedded Checkout inside main result card (Step 2) */}
+                  {showCheckout && (
+                    <div className="mt-6">
+                      <h3 className="text-center font-semibold mb-3">お支払い</h3>
+                      {checkoutInitLoading && (
+                        <div className="text-center text-gray-600 mb-4">
+                          <Loader2 className="w-5 h-5 inline mr-2 animate-spin" />
+                          決済を初期化しています...
+                        </div>
+                      )}
+                      {checkoutError && (
+                        <div className="text-center text-red-600 mb-4">{checkoutError}</div>
+                      )}
+                      {checkoutClientSecret && (
+                        <CheckoutProvider
+                          stripe={stripePromise}
+                          options={{
+                            fetchClientSecret: async () => checkoutClientSecret,
+                            elementsOptions: { appearance: { theme: 'stripe' as const } }
+                          }}
+                        >
+                          <CheckoutForm />
+                        </CheckoutProvider>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -1785,21 +1937,21 @@ export default function ProcessPage() {
       <Dialog open={showEmailDialog} onOpenChange={(open) => { if (!open) handleEmailDialogAction('close') }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>メールアドレス（任意）</DialogTitle>
-            <DialogDescription>入力しなくても続行できます。入力すると決済用に自動入力されます。</DialogDescription>
+            <DialogTitle>写真受信用メールアドレスを入力してください</DialogTitle>
+            <DialogDescription>メールアドレスを入力すると、処理後のマイナンバーカードの写真をお送りします。</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <Input
               type="email"
-              placeholder="メールアドレスを入力（任意）"
+              placeholder="メールアドレスを入力してください..."
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
               className="w-full"
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => handleEmailDialogAction('cancel')}>入力せず続行</Button>
-            <Button onClick={() => handleEmailDialogAction('confirm')} className="bg-emerald-600 hover:bg-emerald-700 text-white">確認して続行</Button>
+            <Button variant="outline" onClick={() => handleEmailDialogAction('cancel')}>キャンセル</Button>
+            <Button onClick={() => handleEmailDialogAction('confirm')} className="bg-emerald-600 hover:bg-emerald-700 text-white">送信</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1808,7 +1960,7 @@ export default function ProcessPage() {
       <canvas ref={canvasRef} style={{ display: 'none' }} />
 
       {/* Loading Overlay for Download Token Creation */}
-      {isCreatingDownloadToken && (
+      {isCreatingDownloadToken && !downloadToken && (
         <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
           <div className="text-center">
             <div className="relative mb-6">
@@ -1836,5 +1988,20 @@ export default function ProcessPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function ProcessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">読み込み中...</p>
+        </div>
+      </div>
+    }>
+      <ProcessPageContent />
+    </Suspense>
   )
 }

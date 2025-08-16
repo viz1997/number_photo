@@ -16,11 +16,25 @@ export async function POST(request: NextRequest) {
     const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
     const fallbackReturnUrl = `${origin}/payment/complete?session_id={CHECKOUT_SESSION_ID}`
 
-    const priceId = process.env.STRIPE_PRICE_ID
-    if (!priceId) {
+    let priceId = process.env.STRIPE_PRICE_ID
+    
+    // 检查价格 ID 是否有效
+    if (!priceId || priceId.startsWith('prod_')) {
+      console.error("Invalid STRIPE_PRICE_ID:", priceId)
       return NextResponse.json({
-        error: "Missing STRIPE_PRICE_ID",
-        details: "Set STRIPE_PRICE_ID to a pre-created Price (e.g., price_...) in your environment."
+        error: "Invalid STRIPE_PRICE_ID configuration",
+        details: "Please create a Price in Stripe Dashboard and set STRIPE_PRICE_ID to the price ID (starts with 'price_')"
+      }, { status: 500 })
+    }
+
+    // 验证价格是否存在
+    try {
+      await stripe.prices.retrieve(priceId)
+    } catch (priceError: any) {
+      console.error("Price not found:", priceError.message)
+      return NextResponse.json({
+        error: "Price not found in Stripe",
+        details: `The price ID '${priceId}' does not exist in your Stripe account. Please create a price for ¥500 in your Stripe Dashboard.`
       }, { status: 500 })
     }
 

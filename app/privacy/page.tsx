@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Camera, Shield, Lock, Eye } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export const metadata: Metadata = {
   title: "プライバシーポリシー | マイナンバーカード写真サービス | MyNumberPhoto",
@@ -70,9 +71,13 @@ export default function PrivacyPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
-                <Camera className="w-5 h-5 text-white" />
-              </div>
+              <Image
+                src="/favicon-32x32.png"
+                alt="Logo"
+                width={32}
+                height={32}
+                className="rounded"
+              />
               <h1 className="text-xl font-bold text-gray-900">マイナンバーカード写真</h1>
             </Link>
           </div>
@@ -238,9 +243,13 @@ export default function PrivacyPage() {
             {/* 公司信息 */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
-                  <Camera className="w-5 h-5 text-white" />
-                </div>
+                <Image
+                  src="/favicon-32x32.png"
+                  alt="Logo"
+                  width={32}
+                  height={32}
+                  className="rounded"
+                />
                 <h3 className="text-xl font-bold">マイナンバーカード写真</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">

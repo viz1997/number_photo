@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getPhotoRecord } from "@/lib/supabase"
 import { getR2Object } from "@/lib/r2-client"
+import sharp from "sharp"
 
 export async function GET(
   request: NextRequest,
@@ -69,6 +70,20 @@ export async function GET(
       return NextResponse.json({ error: "File not found in storage" }, { status: 404 })
     }
 
+    // 使用Sharp将图片转换为4:5比例
+    // マイナンバーカード规格：3.5cm × 4.5cm，即4:5比例
+    // AI处理输出是3:4比例，需要调整为4:5比例用于最终下载
+    const processedImage = await sharp(fileObject)
+      .resize(800, 1000, { // 4:5比例，800x1000像素
+        fit: 'cover', // 保持比例，裁剪多余部分
+        position: 'center' // 居中裁剪
+      })
+      .jpeg({ 
+        quality: 95, // 高质量JPEG
+        progressive: true // 渐进式JPEG
+      })
+      .toBuffer()
+
     // 生成文件名
     const fileName = `my-number-photo-${Date.now()}.jpg`
 
@@ -80,8 +95,8 @@ export async function GET(
     headers.set('Pragma', 'no-cache')
     headers.set('Expires', '0')
 
-    // 直接返回文件流
-    return new NextResponse(fileObject, {
+    // 返回处理后的4:5比例图片
+    return new NextResponse(processedImage, {
       status: 200,
       headers
     })

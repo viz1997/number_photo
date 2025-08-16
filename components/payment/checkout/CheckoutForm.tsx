@@ -10,6 +10,12 @@ export default function CheckoutForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
 
+  // 邮箱验证函数
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email.trim())
+  }
+
   // Prefill email from sessionStorage if present (saved from email dialog in step 2)
   useEffect(() => {
     try {
@@ -25,6 +31,11 @@ export default function CheckoutForm() {
     
     if (!email.trim()) {
       setMessage("Please enter your email address")
+      return
+    }
+
+    if (!email.includes('@') || !email.includes('.')) {
+      setMessage("Please enter a valid email address")
       return
     }
     
@@ -88,7 +99,7 @@ export default function CheckoutForm() {
         {isLoading ? (
           <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white mx-auto" />
         ) : (
-          `Pay ¥${checkout.total.total.amount} now`
+          ` ${checkout.total.total.amount} で購入`
         )}
       </button>
 

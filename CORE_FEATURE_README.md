@@ -21,13 +21,13 @@
 
 **预设Prompt:**
 ```
-Transform this photo into official Japanese ID card format: clean solid white background, crop and reframe to show head and upper shoulders only, center the face vertically in frame with head taking up 70-75% of total height, ensure 4±2mm margin from top of head to frame edge, position face exactly in horizontal center, maintain 34±2mm from chin to top of head measurement, professional passport-style lighting with no shadows on face or background, front-facing pose, gentle subtle smile with slight upward curve of lips - natural and pleasant expression, eyes looking directly at camera with warm friendly gaze, hair should not cover face or ears, remove any accessories like hats or sunglasses, sharp focus on facial features, government ID photo standards compliance, official document quality, maintain the original warm and kind facial expression, output image must be exactly 4.5cm × 3.5cm (45mm × 35mm) passport photo size
+Transform this photo into official Japanese ID card format: clean solid white background, crop and reframe to show head and upper shoulders only, center the face vertically in frame with head taking up 70-75% of total height, ensure 4±2mm margin from top of head to frame edge, position face exactly in horizontal center, maintain 34±2mm from chin to top of head measurement, professional passport-style lighting with no shadows on face or background, front-facing pose, gentle subtle smile with slight upward curve of lips - natural and pleasant expression, eyes looking directly at camera with warm friendly gaze, hair should not cover face or ears, remove any accessories like hats or sunglasses, sharp focus on facial features, government ID photo standards compliance, official document quality, maintain the original warm and kind facial expression, output image must be exactly 3.5cm × 4.5cm (35mm × 45mm) passport photo size
 ```
 
 **输出格式设置:**
-- `aspect_ratio: '35:45'` - 固定证件照比例 (3.5:4.5)
+- `aspect_ratio: '3:4'` - 固定证件照比例 (3.5:4.5)
 - `output_format: 'jpg'` - JPEG格式
-- 符合官方要求：4.5cm × 3.5cm 尺寸
+- 符合官方要求：3.5cm × 4.5cm 尺寸
 
 #### `/api/upload` - 文件上传API
 - 接收用户上传的文件

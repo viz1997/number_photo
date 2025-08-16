@@ -50,10 +50,15 @@ export function validateImageForJapaneseID(metadata: ImageMetadata): ImageValida
 
   // 检查宽高比 (应该是 35:45 或接近的证件照比例)
   const aspectRatio = metadata.width / metadata.height
-  const expectedRatio = 35 / 45 // 0.778
+  const expectedRatio = 35 / 45 // 0.778 (标准证件照比例)
+  const threeFourRatio = 3 / 4 // 0.75 (3:4比例)
   
-  if (Math.abs(aspectRatio - expectedRatio) > 0.1) {
-    warnings.push('画像の縦横比が標準的な証明写真の比率と異なります')
+  // 检查是否接近标准证件照比例或3:4比例
+  const isCloseToStandard = Math.abs(aspectRatio - expectedRatio) < 0.05
+  const isCloseToThreeFour = Math.abs(aspectRatio - threeFourRatio) < 0.05
+  
+  if (!isCloseToStandard && !isCloseToThreeFour) {
+    warnings.push('画像の縦横比が標準的な証明写真の比率と異なります（推奨：35:45または3:4）')
   }
 
   return {
