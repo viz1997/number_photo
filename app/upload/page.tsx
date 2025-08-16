@@ -63,11 +63,44 @@ export default function UploadPage() {
         // Always prefer R2 URL for preview
         if (data.imageUrl) {
           console.log('存储 R2 imageUrl 到 sessionStorage:', data.imageUrl)
-          sessionStorage.setItem("previewUrl", data.imageUrl)
+          // 对于私有桶，data.imageUrl 是对象键，不是完整URL
+          // 我们需要为预览生成一个可访问的URL
+          try {
+            // 生成预览URL（使用预签名URL）
+            const previewRes = await fetch(`/api/original-image/${encodeURIComponent(data.imageUrl)}`)
+            if (previewRes.ok) {
+              const previewData = await previewRes.json()
+              if (previewData?.success && previewData?.imageUrl) {
+                sessionStorage.setItem("previewUrl", previewData.imageUrl)
+                console.log('设置预览URL:', previewData.imageUrl)
+              } else {
+                sessionStorage.setItem("previewUrl", data.imageUrl) // 回退到对象键
+              }
+            } else {
+              sessionStorage.setItem("previewUrl", data.imageUrl) // 回退到对象键
+            }
+          } catch (e) {
+            console.warn('生成预览URL失败，使用对象键:', e)
+            sessionStorage.setItem("previewUrl", data.imageUrl)
+          }
+          
+          // 供处理页使用：对象键
+          try {
+            sessionStorage.setItem("uploadInfo", JSON.stringify({ objectKey: data.imageUrl }))
+            console.log('存储对象键:', data.imageUrl)
+          } catch {}
         } else if (previewUrl) {
           console.log('警告: R2 imageUrl 缺失，暂存本地 previewUrl')
           sessionStorage.setItem("previewUrl", previewUrl)
         }
+
+        // 供处理页使用：上传文件元信息
+        try {
+          sessionStorage.setItem(
+            "uploadedFileInfo",
+            JSON.stringify({ name: file.name, size: file.size, type: file.type })
+          )
+        } catch {}
 
         if (data.photoRecordId) {
           console.log('存储 photoRecordId 到 sessionStorage:', data.photoRecordId)
@@ -117,15 +150,17 @@ export default function UploadPage() {
 
   const handleNext = () => {
     if (uploadedFile) {
-      // Store file data in sessionStorage for demo purposes
-      sessionStorage.setItem(
-        "uploadedFile",
-        JSON.stringify({
-          name: uploadedFile.name,
-          size: uploadedFile.size,
-          type: uploadedFile.type,
-        }),
-      )
+      // 确保处理页预期的键存在
+      try {
+        sessionStorage.setItem(
+          "uploadedFileInfo",
+          JSON.stringify({
+            name: uploadedFile.name,
+            size: uploadedFile.size,
+            type: uploadedFile.type,
+          }),
+        )
+      } catch {}
       
       // Always use the R2 imageUrl if available, fallback to previewUrl only if needed
       const r2ImageUrl = sessionStorage.getItem("previewUrl")
@@ -141,8 +176,8 @@ export default function UploadPage() {
         return
       }
       
-      // 添加 from_upload 参数，标识是从上传页面跳转过来的
-      router.push("/process?from_upload=true")
+      // 直接跳转到处理页面
+      router.push("/process")
     }
   }
 

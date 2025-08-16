@@ -16,6 +16,7 @@ export interface PhotoRecord {
   email: string
   input_image_url: string
   output_image_url: string | null
+  preview_image_url: string | null
   created_at: string
   updated_at: string
 }

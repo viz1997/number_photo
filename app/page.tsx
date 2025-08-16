@@ -103,7 +103,13 @@ export default function HomePage() {
         }
         // 额外保存上传返回信息，便于 /process 使用R2稳定URL回退
         try {
-          const uploadInfo = { fileId: data.fileId, fileName: data.fileName, imageUrl: data.imageUrl, objectKey: data.imageUrl ? new URL(data.imageUrl).pathname.replace(/^\/+/, '') : undefined }
+          const imageUrlStr = typeof data.imageUrl === 'string' ? data.imageUrl : ''
+          const objectKey = imageUrlStr
+            ? (imageUrlStr.startsWith('http')
+                ? new URL(imageUrlStr).pathname.replace(/^\/+/, '')
+                : imageUrlStr.replace(/^\/+/, ''))
+            : undefined
+          const uploadInfo = { fileId: data.fileId, fileName: data.fileName, imageUrl: imageUrlStr, objectKey }
           sessionStorage.setItem("uploadInfo", JSON.stringify(uploadInfo))
         } catch {}
         

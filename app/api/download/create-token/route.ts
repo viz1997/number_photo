@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getPhotoRecord, updatePhotoRecord } from "@/lib/supabase"
+import { getPhotoRecord } from "@/lib/supabase"
 import { generateSecureFileId } from "@/lib/utils"
 
 export async function POST(request: NextRequest) {
   try {
-    const { fileKey, photoRecordId } = await request.json()
-
-    if (!fileKey) {
-      return NextResponse.json({ error: "File key is required" }, { status: 400 })
-    }
+    const { photoRecordId } = await request.json()
 
     if (!photoRecordId) {
       return NextResponse.json({ error: "Photo record ID is required" }, { status: 400 })
@@ -26,6 +22,11 @@ export async function POST(request: NextRequest) {
         error: "Payment required",
         details: "Please complete payment to download the processed photo"
       }, { status: 403 })
+    }
+
+    // Check if processed image exists
+    if (!photoRecord.output_image_url) {
+      return NextResponse.json({ error: "Processed image not found" }, { status: 404 })
     }
 
     // Generate a secure download token using secure random generation

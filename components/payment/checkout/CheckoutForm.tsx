@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { PaymentElement, AddressElement, useCheckout } from "@stripe/react-stripe-js"
+import PromotionCode from "./PromotionCode"
 
 export default function CheckoutForm() {
   const checkout = useCheckout()
@@ -77,6 +78,8 @@ export default function CheckoutForm() {
 
       <h4 className="text-sm font-semibold">Billing Address</h4>
       <AddressElement options={{ mode: "billing" }} />
+
+      <PromotionCode />
 
       <h4 className="text-sm font-semibold">Payment</h4>
       <PaymentElement id="payment-element" />

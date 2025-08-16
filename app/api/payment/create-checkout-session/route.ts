@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
       mode: "payment",
       ui_mode: "custom",
       return_url: returnUrl || fallbackReturnUrl,
+      allow_promotion_codes: true, // 启用促销码功能
       line_items: [
         {
           price: priceId,

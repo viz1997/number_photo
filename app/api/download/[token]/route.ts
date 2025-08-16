@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getR2PublicUrl } from "@/lib/r2-client"
+import { getPhotoRecord } from "@/lib/supabase"
+import { getR2Object } from "@/lib/r2-client"
 
 export async function GET(
   request: NextRequest,
@@ -33,37 +34,62 @@ export async function GET(
       return NextResponse.json({ error: "Token expired" }, { status: 401 })
     }
 
-    // 从sessionStorage或其他地方获取fileKey
-    // 由于这是API路由，我们需要从请求中获取fileKey
-    // 或者我们可以从URL参数中获取
+    // 从URL参数中获取photoRecordId
     const url = new URL(request.url)
-    const fileKey = url.searchParams.get('fileKey')
+    const photoRecordId = url.searchParams.get('photoRecordId')
     
-    if (!fileKey) {
-      return NextResponse.json({ error: "File key is required" }, { status: 400 })
+    if (!photoRecordId) {
+      return NextResponse.json({ error: "Photo record ID is required" }, { status: 400 })
     }
 
-    // 获取R2公共URL
-    const downloadUrl = getR2PublicUrl(fileKey)
+    // 获取照片记录以验证支付状态
+    const photoRecord = await getPhotoRecord(photoRecordId)
+    if (!photoRecord) {
+      return NextResponse.json({ error: "Photo record not found" }, { status: 404 })
+    }
+
+    // 检查支付状态
+    if (!photoRecord.is_paid) {
+      return NextResponse.json({ 
+        error: "Payment required",
+        details: "Please complete payment to download the processed photo"
+      }, { status: 403 })
+    }
+
+    // 检查是否有处理后的图片
+    if (!photoRecord.output_image_url) {
+      return NextResponse.json({ error: "Processed image not found" }, { status: 404 })
+    }
+
+    // 直接从R2获取文件对象
+    const fileKey = photoRecord.output_image_url
+    const fileObject = await getR2Object(fileKey)
     
+    if (!fileObject) {
+      return NextResponse.json({ error: "File not found in storage" }, { status: 404 })
+    }
+
     // 生成文件名
     const fileName = `my-number-photo-${Date.now()}.jpg`
 
-    // 返回下载信息
-    return NextResponse.json({
-      success: true,
-      downloadUrl,
-      fileName,
-      fileKey,
-      secureId,
-      timestamp,
-      message: "Download URL generated successfully"
+    // 设置响应头，强制下载
+    const headers = new Headers()
+    headers.set('Content-Disposition', `attachment; filename="${fileName}"`)
+    headers.set('Content-Type', 'image/jpeg')
+    headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    headers.set('Pragma', 'no-cache')
+    headers.set('Expires', '0')
+
+    // 直接返回文件流
+    return new NextResponse(fileObject, {
+      status: 200,
+      headers
     })
 
   } catch (error) {
     console.error("Download error:", error)
     return NextResponse.json({ 
-      error: "Failed to generate download URL",
+      error: "Failed to download file",
       details: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 })
   }
