@@ -505,17 +505,7 @@ function ProcessPageContent() {
         setShowCheckout(false)
         setCheckoutClientSecret(null)
         
-        // 显示支付成功提示
- 
-        setTimeout(() => {
-        
-          // 如果还没有下载token，保持加载状态
-          if (!downloadToken) {
-            setIsCreatingDownloadToken(true)
-          }
-        }, 3000)
-        
-        // 开始创建下载token的加载状态
+        // 立即开始创建下载token的加载状态，避免回到AI结果页
         setIsCreatingDownloadToken(true)
         
         // 发送支付成功邮件
@@ -731,14 +721,18 @@ function ProcessPageContent() {
     
     // 如果已经尝试过但失败了，允许重试
     if (autoAdvanceTriedRef.current && !showCheckout) return
+    
+    // 如果正在创建下载token，不触发支付流程
+    if (isCreatingDownloadToken) return
 
     const isPaymentCompleted = sessionStorage.getItem("paymentCompleted")
     console.log('支付状态检查:', { isPaymentCompleted })
 
     // 如果已经支付完成，直接尝试创建下载token
     if (isPaymentCompleted === "true") {
+      // 标记已尝试过，避免重复处理
+      autoAdvanceTriedRef.current = true
       const attempt = async () => {
-        autoAdvanceTriedRef.current = true
         // 优先使用保存的R2 key
         let fileKey = processedImageKey
         if (!fileKey) {
@@ -792,7 +786,7 @@ function ProcessPageContent() {
       autoAdvanceTriedRef.current = true
       initEmbeddedCheckout()
     }
-  }, [processedImageUrl, showCheckout, checkoutClientSecret, isInitializing])
+  }, [processedImageUrl, showCheckout, checkoutClientSecret, isInitializing, isCreatingDownloadToken])
 
 
 
