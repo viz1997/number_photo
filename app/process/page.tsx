@@ -1114,7 +1114,7 @@ function ProcessPageContent() {
         if (downloadRes.ok) {
           // 获取文件内容
           const blob = await downloadRes.blob()
-          console.log('获取到文件blob:', blob.size, 'bytes')
+        
           
           // 创建下载链接
           const blobUrl = URL.createObjectURL(blob)
@@ -1156,7 +1156,7 @@ function ProcessPageContent() {
         if (wmRes.ok) {
           // 获取文件内容
           const blob = await wmRes.blob()
-          console.log('获取到水印文件blob:', blob.size, 'bytes')
+      
           
           // 创建下载链接
           const blobUrl = URL.createObjectURL(blob)
@@ -1383,7 +1383,7 @@ function ProcessPageContent() {
                     <Button
                       onClick={async () => {
                         try {
-                          console.log('开始下载，token:', downloadToken)
+                    
                           
                           // 直接调用下载API，让后端处理文件流
                           const photoRecordId = sessionStorage.getItem('photoRecordId')
@@ -1391,9 +1391,9 @@ function ProcessPageContent() {
                             throw new Error('缺少照片记录ID')
                           }
                           
-                          console.log('调用下载API...')
+                  
                           const res = await fetch(`/api/download/${downloadToken}?photoRecordId=${photoRecordId}`)
-                          console.log('下载API响应状态:', res.status)
+                        
                           
                           if (!res.ok) {
                             const errorData = await res.json().catch(() => ({}))
@@ -1403,7 +1403,7 @@ function ProcessPageContent() {
                           
                           // 获取文件内容
                           const blob = await res.blob()
-                          console.log('获取到文件blob:', blob.size, 'bytes')
+                
                           
                           // 创建下载链接
                           const blobUrl = URL.createObjectURL(blob)
@@ -1417,7 +1417,7 @@ function ProcessPageContent() {
                           // 清理blob URL
                           setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
                           
-                          console.log('文件下载完成')
+                    
                         } catch (error) {
                           console.error('下载失败:', error)
                           alert('下载失败，请重试')
@@ -1578,7 +1578,7 @@ function ProcessPageContent() {
                                                                <Button
                                                                      onClick={async () => {
                                      try {
-                                       console.log('开始下载，token:', downloadToken)
+                    
                                        
                                        // 直接调用下载API，让后端处理文件流
                                        const photoRecordId = sessionStorage.getItem('photoRecordId')
@@ -1586,9 +1586,9 @@ function ProcessPageContent() {
                                          throw new Error('缺少照片记录ID')
                                        }
                                        
-                                       console.log('调用下载API...')
+                        
                                        const res = await fetch(`/api/download/${downloadToken}?photoRecordId=${photoRecordId}`)
-                                       console.log('下载API响应状态:', res.status)
+                                  
                                        
                                        if (!res.ok) {
                                          const errorData = await res.json().catch(() => ({}))
@@ -1598,7 +1598,7 @@ function ProcessPageContent() {
                                        
                                        // 获取文件内容
                                        const blob = await res.blob()
-                                       console.log('获取到文件blob:', blob.size, 'bytes')
+                                
                                        
                                        // 创建下载链接
                                        const blobUrl = URL.createObjectURL(blob)
@@ -1611,10 +1611,9 @@ function ProcessPageContent() {
                                        
                                        // 清理blob URL
                                        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
-                                       
-                                       console.log('文件下载完成')
+                                    
                                      } catch (error) {
-                                       console.error('下载失败:', error)
+                                
                                        alert('下载失败，请重试')
                                      }
                                    }}

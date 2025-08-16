@@ -30,33 +30,24 @@ export interface CreatePhotoRecordData {
 
 export async function getPhotoRecord(photoRecordId: string): Promise<PhotoRecord | null> {
   try {
-    console.log('=== getPhotoRecord 开始 ===')
-    console.log('查询记录ID:', photoRecordId)
-    console.log('Supabase 客户端状态:', {
-      url: supabaseUrl ? 'Set' : 'Not set',
-      key: supabaseKey ? 'Set' : 'Not set'
-    })
-    
+ 
     const { data, error } = await supabase
       .from('photos')
       .select('*')
       .eq('id', photoRecordId)
       .single()
 
-    console.log('Supabase 响应:', { data, error })
+  
 
     if (error) {
       console.error('Error fetching photo record:', error)
       return null
     }
 
-    console.log('成功获取记录:', data)
     return data
   } catch (error) {
-    console.error('Exception fetching photo record:', error)
     return null
   } finally {
-    console.log('=== getPhotoRecord 结束 ===')
   }
 }
 
@@ -84,12 +75,7 @@ export async function updatePhotoRecord(
 
 export async function createPhotoRecord(record: CreatePhotoRecordData): Promise<string | null> {
   try {
-    console.log('=== createPhotoRecord 开始 ===')
-    console.log('输入参数:', record)
-    console.log('Supabase 客户端状态:', {
-      url: supabaseUrl ? 'Set' : 'Not set',
-      key: supabaseKey ? 'Set' : 'Not set'
-    })
+ 
     
     const { data, error } = await supabase
       .from('photos')
@@ -97,19 +83,18 @@ export async function createPhotoRecord(record: CreatePhotoRecordData): Promise<
       .select('id')
       .single()
 
-    console.log('Supabase 响应:', { data, error })
+   
 
     if (error) {
-      console.error('Error creating photo record:', error)
+     
       return null
     }
 
-    console.log('成功创建记录，ID:', data.id)
     return data.id
   } catch (error) {
     console.error('Exception creating photo record:', error)
     return null
   } finally {
-    console.log('=== createPhotoRecord 结束 ===')
+ 
   }
 }

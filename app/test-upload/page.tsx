@@ -17,7 +17,6 @@ export default function TestUploadPage() {
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString()
     setDebugLog(prev => [...prev, `[${timestamp}] ${message}`])
-    console.log(`[UPLOAD_DEBUG] ${message}`)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

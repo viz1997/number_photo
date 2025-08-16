@@ -92,7 +92,7 @@ console.log(`   R2端点: ${endpoint}`)
 
 console.log('')
 console.log('🎯 下一步:')
-console.log('1. 确保在Cloudflare R2中创建了对应的存储桶')
+('1. 确保在Cloudflare R2中创建了对应的存储桶')
 console.log('2. 确保公开桶已启用公共访问')
 console.log('3. 配置公开桶的自定义域名')
 console.log('4. 运行 npm run test-storage 测试连接')

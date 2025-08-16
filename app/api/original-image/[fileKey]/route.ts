@@ -15,11 +15,11 @@ export async function GET(
     // 解码URL编码的文件键
     const decodedFileKey = decodeURIComponent(fileKey)
     
-    console.log('Generating presigned URL for original image:', decodedFileKey)
+ 
 
-    // 生成预签名URL，有效期2小时（7200秒）
-    // 这样用户有足够时间查看图片，同时保持安全性
-    const presignedUrl = await generatePresignedUrl(decodedFileKey, 7200)
+    // 生成预签名URL，有效期7天（604800秒）
+    // 这样用户有足够时间查看原图，同时保持安全性
+    const presignedUrl = await generatePresignedUrl(decodedFileKey, 604800)
 
     return NextResponse.json({
       success: true,

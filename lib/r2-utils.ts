@@ -13,13 +13,7 @@ export async function uploadToR2(
   bucket: string = R2_BUCKET_NAME
 ): Promise<string> {
   try {
-    console.log('R2 upload attempt:', {
-      bucket,
-      key,
-      contentType,
-      fileSize: file instanceof Buffer ? file.length : file.length,
-      endpoint: process.env.R2_ENDPOINT || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
-    })
+
 
     const command = new PutObjectCommand({
       Bucket: bucket,
@@ -29,17 +23,14 @@ export async function uploadToR2(
     })
 
     const result = await r2Client.send(command)
-    console.log('R2 upload success:', result)
     
     // 根据存储桶类型返回不同的URL
     if (bucket === R2_PUBLIC_BUCKET_NAME) {
       // 公开桶使用公共域名
       const fileUrl = getR2FileUrl(key)
-      console.log('Generated public file URL:', fileUrl)
       return fileUrl
     } else {
       // 私有桶返回对象键，用于后续生成预签名URL
-      console.log('Uploaded to private bucket, key:', key)
       return key
     }
   } catch (error) {
@@ -73,7 +64,7 @@ export async function downloadAndUploadToR2(
   bucket: string = R2_BUCKET_NAME
 ): Promise<string> {
   try {
-    console.log('Downloading image from URL:', imageUrl)
+   
     
     const response = await fetch(imageUrl)
     if (!response.ok) {
@@ -83,7 +74,7 @@ export async function downloadAndUploadToR2(
     const arrayBuffer = await response.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
     
-    console.log('Downloaded image size:', buffer.length, 'bytes')
+   
     
     // 获取Content-Type
     const contentType = response.headers.get('content-type') || 'image/jpeg'
@@ -104,7 +95,7 @@ export async function generateWatermarkedPreview(
   outputKey: string
 ): Promise<string> {
   try {
-    console.log('Generating watermarked preview for:', originalImageUrl)
+ 
     
     // 下载原图
     const response = await fetch(originalImageUrl)
@@ -161,7 +152,6 @@ export async function generateWatermarkedPreview(
     // 将canvas转换为buffer
     const watermarkedBuffer = canvas.toBuffer('image/jpeg', { quality: 0.9 })
     
-    console.log('Watermark added successfully, watermarked image size:', watermarkedBuffer.length, 'bytes')
     
     // 上传到私有桶
     const previewKey = outputKey.replace(R2_PATHS.OUTPUT, R2_PATHS.PREVIEW)

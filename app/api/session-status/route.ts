@@ -31,11 +31,7 @@ export async function GET(request: NextRequest) {
           const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
           const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
           
-          console.log('Payment completed, updating photo record:', {
-            photoRecordId,
-            supabaseUrl: supabaseUrl ? 'Set' : 'Missing',
-            serviceRoleKey: serviceRoleKey ? 'Set' : 'Missing'
-          })
+      
           
           if (supabaseUrl && serviceRoleKey) {
             const admin = createClient(supabaseUrl, serviceRoleKey)
@@ -50,7 +46,7 @@ export async function GET(request: NextRequest) {
             if (error) {
               console.error('Failed to update photo record as paid:', error)
             } else {
-              console.log('Successfully updated photo record as paid:', photoRecordId)
+              
             }
           } else {
             console.error("Missing Supabase configuration:", {

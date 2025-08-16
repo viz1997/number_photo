@@ -32,13 +32,7 @@ export async function POST(request: NextRequest) {
     // Convert file to buffer
     const fileBuffer = Buffer.from(await file.arrayBuffer())
     
-    console.log('Uploading to R2:', {
-      bucket: process.env.R2_BUCKET_NAME,
-      key: fileKey,
-      fileName: fileName,
-      fileSize: fileBuffer.length,
-      endpoint: process.env.R2_ENDPOINT
-    })
+
     
     // Upload to R2
     const imageUrl = await uploadToR2(
@@ -50,23 +44,14 @@ export async function POST(request: NextRequest) {
     // Create photo record in Supabase
     let photoRecordId: string | null = null
     try {
-      console.log('=== 开始创建数据库记录 ===')
-      console.log('Environment check:', {
-        NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Not set',
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Set' : 'Not set'
-      })
+
       
       // 生成用户ID
       const timestamp = Date.now()
       const random = Math.random().toString(36).substring(2, 8)
       const userId = `user-${timestamp}-${random}`
       
-      console.log('调用 createPhotoRecord 参数:', {
-        user_id: userId,
-        email: "",
-        input_image_url: imageUrl,
-        is_paid: false
-      })
+ 
       
       photoRecordId = await createPhotoRecord({
         user_id: userId,
@@ -75,7 +60,6 @@ export async function POST(request: NextRequest) {
         is_paid: false, // Default to false for demo
       })
       
-      console.log('createPhotoRecord 返回值:', photoRecordId)
       
       if (photoRecordId) {
         console.log('Photo record created successfully:', photoRecordId)

@@ -12,17 +12,39 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    console.log('开始发送支付成功邮件:', { email, photoRecordId, orderId, amount });
-
-    // 1. 更新付费状态到Brevo
-    if (orderId && amount) {
-      const updateStatus = await brevoAPI.updatePaidStatus(email, photoRecordId, orderId, amount);
-      console.log('更新付费状态结果:', updateStatus);
+    // 如果没有提供downloadUrl，生成一个7天有效期的下载链接
+    let finalDownloadUrl = downloadUrl;
+    if (!finalDownloadUrl) {
+      try {
+        const linkResponse = await fetch(`${request.nextUrl.origin}/api/download/email-link`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ photoRecordId })
+        });
+        
+        if (linkResponse.ok) {
+          const linkData = await linkResponse.json();
+                   if (linkData.success && linkData.downloadUrl) {
+           finalDownloadUrl = linkData.downloadUrl;
+           console.log('生成了30天有效期的邮件下载链接:', finalDownloadUrl);
+         }
+        }
+             } catch (error) {
+         console.warn('生成邮件下载链接失败，使用提供的downloadUrl:', error);
+       }
     }
 
-    // 2. 发送支付成功邮件
-    const emailResult = await brevoAPI.sendPaymentSuccessEmail(email, photoRecordId, downloadUrl);
-    console.log('发送邮件结果:', emailResult);
+
+
+         // 1. 更新付费状态到Brevo
+     if (orderId && amount) {
+       const updateStatus = await brevoAPI.updatePaidStatus(email, photoRecordId, orderId, amount);
+       console.log('更新付费状态结果:', updateStatus);
+     }
+
+         // 2. 发送支付成功邮件
+     const emailResult = await brevoAPI.sendPaymentSuccessEmail(email, photoRecordId, finalDownloadUrl);
+     console.log('发送邮件结果:', emailResult);   
 
     if (!emailResult.success) {
       console.error('发送邮件失败:', emailResult.error);

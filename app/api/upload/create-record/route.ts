@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.log('=== Create Record API Started ===')
-    console.log('Creating record for image URL:', imageUrl)
+    
+    
 
     // Create photo record in database
     const photoRecord = await createPhotoRecord({
@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
 
     const photoRecordId = photoRecord.id
 
-    console.log('=== Create Record API Completed Successfully ===')
-    console.log('Photo record ID created:', photoRecordId)
+    
+    
 
     return NextResponse.json({
       success: true,

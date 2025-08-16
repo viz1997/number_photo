@@ -27,9 +27,7 @@ export default function UploadPage() {
 
   const simulateUpload = async (file: File) => {
     if (!file) return
-    
-    console.log('=== simulateUpload 开始 ===')
-    console.log('上传文件:', file.name, file.size, file.type)
+
     
     setIsUploading(true)
     setUploadProgress(0)
@@ -38,31 +36,26 @@ export default function UploadPage() {
       const formData = new FormData()
       formData.append('file', file)
       
-      console.log('准备发送 /api/upload 请求...')
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       })
 
-      console.log('upload response status:', response.status)
-      console.log('upload response ok:', response.ok)
+
 
       if (!response.ok) {
         throw new Error('Upload failed')
       }
 
       const data = await response.json()
-      console.log('upload response data:', data)
-      console.log('data.success:', data.success)
-      console.log('data.imageUrl:', data.imageUrl)
-      console.log('data.photoRecordId:', data.photoRecordId)
+
       
       if (data.success) {
         setUploadProgress(100)
 
         // Always prefer R2 URL for preview
         if (data.imageUrl) {
-          console.log('存储 R2 imageUrl 到 sessionStorage:', data.imageUrl)
+        
           // 对于私有桶，data.imageUrl 是对象键，不是完整URL
           // 我们需要为预览生成一个可访问的URL
           try {
@@ -72,7 +65,7 @@ export default function UploadPage() {
               const previewData = await previewRes.json()
               if (previewData?.success && previewData?.imageUrl) {
                 sessionStorage.setItem("previewUrl", previewData.imageUrl)
-                console.log('设置预览URL:', previewData.imageUrl)
+              
               } else {
                 sessionStorage.setItem("previewUrl", data.imageUrl) // 回退到对象键
               }
@@ -87,10 +80,10 @@ export default function UploadPage() {
           // 供处理页使用：对象键
           try {
             sessionStorage.setItem("uploadInfo", JSON.stringify({ objectKey: data.imageUrl }))
-            console.log('存储对象键:', data.imageUrl)
+          
           } catch {}
         } else if (previewUrl) {
-          console.log('警告: R2 imageUrl 缺失，暂存本地 previewUrl')
+        
           sessionStorage.setItem("previewUrl", previewUrl)
         }
 
@@ -103,7 +96,7 @@ export default function UploadPage() {
         } catch {}
 
         if (data.photoRecordId) {
-          console.log('存储 photoRecordId 到 sessionStorage:', data.photoRecordId)
+          
           sessionStorage.setItem("photoRecordId", data.photoRecordId)
         }
       } else {
@@ -114,7 +107,7 @@ export default function UploadPage() {
       alert('アップロードに失敗しました。もう一度お試しください。')
     } finally {
       setIsUploading(false)
-      console.log('=== simulateUpload 结束 ===')
+
     }
   }
 
@@ -165,13 +158,13 @@ export default function UploadPage() {
       // Always use the R2 imageUrl if available, fallback to previewUrl only if needed
       const r2ImageUrl = sessionStorage.getItem("previewUrl")
       if (r2ImageUrl && r2ImageUrl.startsWith('http')) {
-        console.log('使用 R2 imageUrl 进行下一步处理:', r2ImageUrl)
+       
         sessionStorage.setItem("previewUrl", r2ImageUrl)
       } else if (previewUrl) {
-        console.log('警告: 使用本地 previewUrl，可能无法被 Replicate API 处理:', previewUrl)
+      
         sessionStorage.setItem("previewUrl", previewUrl)
       } else {
-        console.log('错误: 没有可用的图片 URL')
+       
         alert('画像のURLが見つかりません。もう一度アップロードしてください。')
         return
       }
